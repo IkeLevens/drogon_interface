@@ -175,6 +175,8 @@ class DrogonControlInterface
 	Position getPosition(int arm); // this returns the position object being used to maintain the
 	// cartesian location of an end effector
 	void setupMoveGroups(); // this sets move groups for motion planning
+	void executePlan(const moveit::planning_interface::MoveGroup::Plan &plan, const int arm); // this executes the plan
+	// which is passed by reference as an argument to parameter plan.
 	moveit::planning_interface::MoveGroup::Plan getPlan(const map<string, double> &goal, const int arm); // this returns a motion plan from the
 	// current robot's current configuration to the goal configuration.
 	moveit::planning_interface::MoveGroup::Plan getPlan(const map<string, double> &goal, const map<string, double> &start, const int arm);

@@ -540,3 +540,10 @@ moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(cons
 }
 moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const map<string, double> &start, const int arm) {
 }
+void DrogonControlInterface::executePlan(const moveit::planning_interface::MoveGroup::Plan &plan, const int arm) {
+	if (arm == LEFT) {
+		leftArmPlanner->execute(plan);
+	} else {
+		rightArmPlanner->execute(plan);
+	}
+}

@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.8.3)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 project(drogon_interface)
 
 
@@ -86,6 +85,7 @@ add_library(drogon_interface_library
 ## Declare a cpp executable
 add_executable(drogon_interface_node src/DrogonControlInterfaceKeyboard.cpp)
 add_executable(ik_test src/test.cpp)
+add_executable(planner src/planner.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -100,6 +100,10 @@ target_link_libraries(drogon_interface_library
 	${catkin_LIBRARIES}
 )
 target_link_libraries(ik_test
+	drogon_interface_library
+	${catkin_LIBRARIES}
+)
+target_link_libraries(planner
 	drogon_interface_library
 	${catkin_LIBRARIES}
 )
