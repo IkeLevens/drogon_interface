@@ -16,6 +16,7 @@
 #include <sstream>			//For sending topic messages in ROS
 #include <ros/ros.h>		//Headers for ros
 
+#include <moveit/move_group_interface/move_group.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>	//moveIt! includes
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/robot_state/robot_state.h>
@@ -123,6 +124,9 @@ class DrogonControlInterface
 	robot_model::JointModelGroup* leftArmGroup;
 	robot_model::JointModelGroup* rightArmGroup;
 
+	move_group_interface::MoveGroup* leftArmPlanner;
+	move_group_interface::MoveGroup* rightArmPlanner;
+
 	void setupRobotModel(); // sets up robot model for use in moveit function calls
 	void verifyGoalLimits(map<string, double>& goal); // verifies that a goal state's
 	// joint angles are within the joint angle limits
@@ -170,6 +174,11 @@ class DrogonControlInterface
 	geometry_msgs::Pose getPose(int arm); // this returns the current pose of an end effector
 	Position getPosition(int arm); // this returns the position object being used to maintain the
 	// cartesian location of an end effector
+	void setupMoveGroups(); // this sets move groups for motion planning
+	moveit::planning_interface::MoveGroup::Plan getPlan(const map<string, double> &goal, const int arm); // this returns a motion plan from the
+	// current robot's current configuration to the goal configuration.
+	moveit::planning_interface::MoveGroup::Plan getPlan(const map<string, double> &goal, const map<string, double> &start, const int arm);
+	// this returns a motion plan from the start configuration to the goal configuration.
 };
 
 #endif

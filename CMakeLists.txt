@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 project(drogon_interface)
+
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-set(baxter_msgs_DIR ~/workspaces/ws_baxter/devel/share/baxter_msgs/cmake)
-find_package(catkin REQUIRED COMPONENTS message_generation roscpp rospy baxter_msgs sensor_msgs std_msgs moveit_core moveit_ros_manipulation)
+set(baxter_msgs_DIR ~/workspaces/baxter_moveit/devel/share/baxter_msgs/cmake)
+set(moveit_ros_move_group_DIR /opt/ros/hydro/share/moveit_ros_move_group/cmake)
+find_package(catkin REQUIRED COMPONENTS message_generation roscpp rospy baxter_msgs sensor_msgs std_msgs moveit_core moveit_ros_move_group moveit_ros_manipulation)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -59,7 +62,7 @@ find_package(catkin REQUIRED COMPONENTS message_generation roscpp rospy baxter_m
 catkin_package(
 	INCLUDE_DIRS include
 	LIBRARIES ${PROJECT_NAME}
-	CATKIN_DEPENDS message_runtime roscpp rospy sensor_msgs std_msgs moveit_core moveit_ros_manipulation
+	CATKIN_DEPENDS message_runtime roscpp rospy sensor_msgs std_msgs moveit_core moveit_ros_move_group moveit_ros_manipulation
 	DEPENDS system_lib
 )
 
@@ -82,7 +85,6 @@ add_library(drogon_interface_library
 
 ## Declare a cpp executable
 add_executable(drogon_interface_node src/DrogonControlInterfaceKeyboard.cpp)
-#add_executable(kinematics_test src/kinematics_tutorial.cpp)
 add_executable(ik_test src/test.cpp)
 
 ## Add cmake target dependencies of the executable/library
@@ -94,9 +96,9 @@ target_link_libraries(drogon_interface_node
 	drogon_interface_library
    ${catkin_LIBRARIES}
 )
-#target_link_libraries(kinematics_test
-#	${catkin_LIBRARIES}
-#)
+target_link_libraries(drogon_interface_library
+	${catkin_LIBRARIES}
+)
 target_link_libraries(ik_test
 	drogon_interface_library
 	${catkin_LIBRARIES}

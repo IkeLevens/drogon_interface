@@ -23,6 +23,7 @@
 #include <moveit/robot_model/joint_model_group.h>
 #include <moveit/robot_state/robot_state.h>
 
+#include <moveit/move_group_interface/move_group.h>
 #include <std_msgs/Header.h>//Headers for ros message classes
 #include <std_msgs/Empty.h>
 #include <std_msgs/Bool.h>
@@ -209,6 +210,7 @@ void DrogonControlInterface::setupRobotModel()
 	state->setToDefaultValues();
 	leftArmGroup = model->getJointModelGroup("left_arm");
 	rightArmGroup = model->getJointModelGroup("right_arm");
+	setupMoveGroups();
 }
 void DrogonControlInterface::rosEnable()
 {
@@ -516,4 +518,25 @@ bool DrogonControlInterface::closeEnough(map<string, double> &goal, map<string, 
 	}
 //	cout << "closeEnough: true" << endl;
 	return true;
+}
+void DrogonControlInterface::setupMoveGroups() {
+	move_group_interface::MoveGroup temp("left_arm");
+	leftArmPlanner = &temp;
+	move_group_interface::MoveGroup temp1("right_arm");
+	rightArmPlanner = &temp1;
+}
+moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const int arm) {
+	moveit::planning_interface::MoveGroup::Plan plan;
+	if (arm == LEFT) {
+		leftArmPlanner->setStartStateToCurrentState();
+		leftArmPlanner->setJointValueTarget(goal);
+		leftArmPlanner->plan(plan);
+	} else {
+		rightArmPlanner->setStartStateToCurrentState();
+		rightArmPlanner->setJointValueTarget(goal);
+		rightArmPlanner->plan(plan);
+	}
+	return plan;
+}
+moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const map<string, double> &start, const int arm) {
 }
