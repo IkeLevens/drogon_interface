@@ -6,15 +6,14 @@
  */
 #include <cstdlib>			//standard library for C/C++
 #include <iostream>			//input and output stream packages
-#include <string>			//character string class
-#include <map>				//data structure to store value by reference key
 #include <stdio.h>			//headers for standard input and output
 #include <unistd.h>			//_getch*/
 #include <termios.h>		//_getch*/
 #include <unistd.h>
-//#include <roscpp>			//ROS C++ API
 #include <sstream>			//For sending topic messages in ROS
 #include <ros/ros.h>		//Headers for ros
+#include <tf/tf.h>
+#include <eigen_conversions/eigen_msg.h>
 
 #include <moveit/move_group_interface/move_group.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>	//moveIt! includes
@@ -25,6 +24,7 @@
 #include <std_msgs/Header.h>//Headers for ros message classes
 #include <std_msgs/Empty.h>
 #include <std_msgs/Bool.h>
+#include <std_msgs/String.h>
 #include <std_msgs/UInt16.h>
 #include <sensor_msgs/JointState.h>				//Headers for reading joint positions
 #include <baxter_msgs/GripperCommand.h>	//Headers for messages from Baxter RSDK
@@ -82,6 +82,12 @@ class Limits
 	Limits(); // This method populates the jointAngleUpperLimits and jointAngleLowerLimits
 	//elements with the proper values for a Baxter Research Robot
 };
+// This class handles incoming commands from the web interface.
+class WebListener
+{
+	public:
+	void commandCallback (const std_msgs::String& msg);
+};
 // This is the main class of the library.  It is intended to be used as a control interface
 // for a Baxter Research Robot.  This library makes use of Robot Operating System, moveIt,
 // and the Baxter Research Software Development Kit.
@@ -111,6 +117,9 @@ class DrogonControlInterface
 	ros::Subscriber rightSub;
 	ros::Subscriber leftEndSub;
 	ros::Subscriber rightEndSub;
+	
+	// ros topic subsciber for web interface
+	ros::Subscriber webSubscriber;
 
 	ros::ServiceClient ikLeftClient; // service client for Baxter RSDK's built in inverse
 	// kinematic solver for the left endpoint
@@ -144,9 +153,13 @@ class DrogonControlInterface
 	// These methods create and return ros topic subscribers
 	ros::Subscriber getArmSubscriber (int arm, State& state, ros::NodeHandle& n);
 	ros::Subscriber getEndSubscriber (int arm, Position& position, ros::NodeHandle& n);
+	ros::Subscriber getWebSubscriber (WebListener& webListener, ros::NodeHandle& n);
 
 	// This method creates and returns a ros service client
 	ros::ServiceClient getIKServiceClient(int arm, ros::NodeHandle& n);
+
+	// This is a WebListener for handling incoming commands from the web interface
+	WebListener webListener;
 	public:
 	DrogonControlInterface(); // constructor for this class, this will be called by executables
 	// making use of this library

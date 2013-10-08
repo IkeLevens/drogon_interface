@@ -5,9 +5,9 @@ project(drogon_interface)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-set(baxter_msgs_DIR ~/workspaces/baxter_moveit/devel/share/baxter_msgs/cmake)
-set(moveit_ros_move_group_DIR /opt/ros/hydro/share/moveit_ros_move_group/cmake)
-find_package(catkin REQUIRED COMPONENTS message_generation roscpp rospy baxter_msgs sensor_msgs std_msgs moveit_core moveit_ros_move_group moveit_ros_manipulation)
+#set(baxter_msgs_DIR ~/workspaces/baxter_moveit/devel/share/baxter_msgs/cmake)
+#set(moveit_ros_move_group_DIR /opt/ros/hydro/share/moveit_ros_move_group/cmake)
+find_package(catkin REQUIRED COMPONENTS message_generation roscpp rospy baxter_msgs sensor_msgs std_msgs moveit_core moveit_ros_planning_interface moveit_ros_manipulation)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -61,7 +61,7 @@ find_package(catkin REQUIRED COMPONENTS message_generation roscpp rospy baxter_m
 catkin_package(
 	INCLUDE_DIRS include
 	LIBRARIES ${PROJECT_NAME}
-	CATKIN_DEPENDS message_runtime roscpp rospy sensor_msgs std_msgs moveit_core moveit_ros_move_group moveit_ros_manipulation
+	CATKIN_DEPENDS message_runtime roscpp rospy sensor_msgs std_msgs moveit_core moveit_ros_planning_interface moveit_ros_manipulation
 	DEPENDS system_lib
 )
 

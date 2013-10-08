@@ -5,36 +5,6 @@
  * Created on June 24, 2013, 10:08 AM
  */
 #include <DrogonControlInterfaceLibrary.h>
-#include <cstdlib>			//standard library for C/C++
-#include <iostream>			//input and output stream packages
-#include <string>			//character string class
-#include <map>				//data structure to store value by reference key
-#include <stdio.h>			//headers for standard input and output
-#include <unistd.h>			//_getch*/
-#include <termios.h>		//_getch*/
-#include <unistd.h>
-#include <sstream>			//For sending topic messages in ROS
-#include <ros/ros.h>		//Headers for ros
-#include <tf/tf.h>
-#include <eigen_conversions/eigen_msg.h>
-
-#include <moveit/robot_model_loader/robot_model_loader.h>	//moveIt! includes
-#include <moveit/robot_model/robot_model.h>
-#include <moveit/robot_model/joint_model_group.h>
-#include <moveit/robot_state/robot_state.h>
-
-#include <moveit/move_group_interface/move_group.h>
-#include <std_msgs/Header.h>//Headers for ros message classes
-#include <std_msgs/Empty.h>
-#include <std_msgs/Bool.h>
-#include <std_msgs/UInt16.h>
-#include <sensor_msgs/JointState.h>				//Headers for reading joint positions
-#include <baxter_msgs/GripperCommand.h>			//Headers for messages in Baxter RSDK
-#include <baxter_msgs/JointCommandMode.h>
-#include <baxter_msgs/JointPositions.h>
-#include <baxter_msgs/JointVelocities.h>
-#include <baxter_msgs/EndpointState.h>
-#include <baxter_msgs/SolvePositionIK.h>
 
 using namespace std;
 using namespace drogon;
@@ -86,7 +56,11 @@ string Position::toString ()
 	ss << " ";
 	ss << pose.orientation.w;
 	return ss.str();
-}	
+}
+void WebListener::commandCallback (const std_msgs::String& msg)
+{
+	system(("rosrun joint_trajectory file_playback.py -f " + msg.data).c_str());
+}
 DrogonControlInterface::DrogonControlInterface()
 {
 	leftArmPub = getArmPublisher(LEFT, n);
@@ -103,6 +77,7 @@ DrogonControlInterface::DrogonControlInterface()
 	rightEndSub = getEndSubscriber(RIGHT, rightPosition, n);
 	ikLeftClient = getIKServiceClient(LEFT, n);
 	ikRightClient = getIKServiceClient(RIGHT, n);
+	webSubscriber = getWebSubscriber(webListener, n);
 	while(!(ikLeftClient.exists()&&ikRightClient.exists()))
 	{
 		ROS_INFO("Waiting for service");
@@ -147,6 +122,12 @@ ros::Subscriber DrogonControlInterface::getEndSubscriber (int arm, Position& pos
 	{
 		sub = n.subscribe("sdk/robot/limb/right/endpoint/state", 1, &Position::positionCallback, &position);
 	}
+	return sub;
+}
+ros::Subscriber DrogonControlInterface::getWebSubscriber (WebListener& webListener, ros::NodeHandle& n)
+{
+	ros::Subscriber sub;
+	sub = n.subscribe("/web", 1, &WebListener::commandCallback, &webListener);
 	return sub;
 }
 ros::Publisher DrogonControlInterface::getCalibratePublisher(int arm, ros::NodeHandle& n)
@@ -502,7 +483,7 @@ void DrogonControlInterface::verifyGoalLimits(map<string, double> &goal)
 }
 bool DrogonControlInterface::closeEnough(map<string, double> &goal, map<string, double> &state)
 {
-	ros::spinOnce();
+//	ros::spinOnce();
 //	cout << "begin closeEnough" << endl;
 //	cout << "goal: " << goal << endl;
 //	cout << "state: " << state << endl;
