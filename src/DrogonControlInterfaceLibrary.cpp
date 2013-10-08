@@ -497,7 +497,7 @@ void DrogonControlInterface::verifyGoalLimits(map<string, double> &goal)
 }
 bool DrogonControlInterface::closeEnough(map<string, double> &goal, map<string, double> &state)
 {
-//	ros::spinOnce();
+	ros::spinOnce();
 //	cout << "begin closeEnough" << endl;
 //	cout << "goal: " << goal << endl;
 //	cout << "state: " << state << endl;
@@ -514,13 +514,15 @@ bool DrogonControlInterface::closeEnough(map<string, double> &goal, map<string, 
 //	cout << "closeEnough: true" << endl;
 	return true;
 }
-void DrogonControlInterface::setupMoveGroups() {
+void DrogonControlInterface::setupMoveGroups()
+{
 	move_group_interface::MoveGroup temp("left_arm");
 	leftArmPlanner = &temp;
 	move_group_interface::MoveGroup temp1("right_arm");
 	rightArmPlanner = &temp1;
 }
-moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const int arm) {
+moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const int arm)
+{
 	moveit::planning_interface::MoveGroup::Plan plan;
 	if (arm == LEFT) {
 		leftArmPlanner->setStartStateToCurrentState();
@@ -533,12 +535,35 @@ moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(cons
 	}
 	return plan;
 }
-moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const map<string, double> &start, const int arm) {
+moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const map<string, double> &start, const int arm)
+{
+	moveit::planning_interface::MoveGroup::Plan plan;
+	moveit::core::RobotState startState(model);
+	startState.setVariablePositions(start);
+	if (arm == LEFT) {
+		leftArmPlanner->setStartState(startState);
+		leftArmPlanner->setJointValueTarget(goal);
+		leftArmPlanner->plan(plan);
+	} else {
+		rightArmPlanner->setStartState(startState);
+		rightArmPlanner->setJointValueTarget(goal);
+		rightArmPlanner->plan(plan);
+	}
+	return plan;
 }
-void DrogonControlInterface::executePlan(const moveit::planning_interface::MoveGroup::Plan &plan, const int arm) {
+void DrogonControlInterface::executePlan(const moveit::planning_interface::MoveGroup::Plan &plan, const int arm)
+{
 	if (arm == LEFT) {
 		leftArmPlanner->execute(plan);
 	} else {
 		rightArmPlanner->execute(plan);
 	}
+}
+void DrogonControlInterface::enableWebServer()
+{
+	webListener.enableWeb();
+}
+void DrogonControlInterface::disableWebServer()
+{
+	webListener.disableWeb();
 }

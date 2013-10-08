@@ -27,6 +27,7 @@
 #include <baxter_msgs/JointPositions.h>
 #include <ros/callback_queue.h>
 using namespace std;
+using namespace drogon;
 
 void printMap (map<string, double> toPrint);
 void printHelp ();

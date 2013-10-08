@@ -1,6 +1,4 @@
 #include <DrogonControlInterfaceLibrary.h>
-#include <iostream>
-#include <fstream>
 
 using namespace std;
 
@@ -10,8 +8,9 @@ DrogonControlInterface* dci;
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "Drogon_Planner");
-	if (argc < 1) {
+	if (argc < 2) {
 		printf("a file name is required./n");
+		return -1;
 	}
 	cout << "creating DrogonControlInterface" << endl;
 	dci = new DrogonControlInterface();
@@ -19,8 +18,8 @@ int main(int argc, char** argv)
 	dci->rosEnable();
 	map<string, double> goal;
 	fillMap(goal, argv[1]);
-	moveit::planning_interface::MoveGroup::Plan plan = dci->getPlan(goal, drogon::LEFT);
-	dci->executePlan(plan, drogon::LEFT);
+//	moveit::planning_interface::MoveGroup::Plan plan = dci->getPlan(goal, drogon::LEFT);
+//	dci->executePlan(plan, drogon::LEFT);
 	ros::waitForShutdown();
 }
 void fillMap(map<string, double> &goal, string filename)
@@ -32,7 +31,15 @@ void fillMap(map<string, double> &goal, string filename)
 	while(!goalInput.eof()) {
 		getline(goalInput, line);
 		cout << line << endl;
-		// do stuff
+		stringstream lineStream(line);
+		string key;
+		string valueString;
+		double value;
+		while (lineStream >> key) {
+			lineStream >> valueString;
+			value = atof(valueString.c_str());
+			goal[key] = value;
+		}
 	}
 	goalInput.close();
 }

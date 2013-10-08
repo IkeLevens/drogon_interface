@@ -6,6 +6,8 @@
  */
 #include <cstdlib>			//standard library for C/C++
 #include <iostream>			//input and output stream packages
+#include <fstream>			//file input stream tools for C/C++
+#include <math.h>			//standardy c/c++ math library
 #include <stdio.h>			//headers for standard input and output
 #include <unistd.h>			//_getch*/
 #include <termios.h>		//_getch*/
@@ -53,7 +55,6 @@ const string jointNames [] = {
 };
 const int JOINTS = 7;
 }
-using namespace drogon;
 // This class is used to keep a joint state listener on an arm
 class State
 {
@@ -199,6 +200,8 @@ class DrogonControlInterface
 	// current robot's current configuration to the goal configuration.
 	moveit::planning_interface::MoveGroup::Plan getPlan(const map<string, double> &goal, const map<string, double> &start, const int arm);
 	// this returns a motion plan from the start configuration to the goal configuration.
+	void enableWebServer ();
+	void disableWebServer ();
 };
 
 #endif
