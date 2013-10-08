@@ -57,9 +57,23 @@ string Position::toString ()
 	ss << pose.orientation.w;
 	return ss.str();
 }
+WebListener::WebListener()
+{
+	webEnabled = false;
+}
+void WebListener::enableWeb ()
+{
+	webEnabled = true;
+}
+void WebListener::disableWeb ()
+{
+	webEnabled = false;
+}
 void WebListener::commandCallback (const std_msgs::String& msg)
 {
-	system(("rosrun joint_trajectory file_playback.py -f " + msg.data).c_str());
+	if (webEnabled && (msg.data.find(';') == std::string::npos)) {
+		system(("rosrun joint_trajectory file_playback.py -f " + msg.data).c_str());
+	}
 }
 DrogonControlInterface::DrogonControlInterface()
 {

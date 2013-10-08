@@ -85,7 +85,12 @@ class Limits
 // This class handles incoming commands from the web interface.
 class WebListener
 {
+	private:
+	bool webEnabled;
 	public:
+	WebListener();
+	void enableWeb ();
+	void disableWeb ();
 	void commandCallback (const std_msgs::String& msg);
 };
 // This is the main class of the library.  It is intended to be used as a control interface
