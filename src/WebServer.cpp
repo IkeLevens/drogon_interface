@@ -10,4 +10,5 @@ int main (int argc, char** argv)
 	dci.rosEnable();
 	dci.enableWebServer();
 	ros::waitForShutdown();
+	dci.rosDisable();
 }

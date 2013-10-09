@@ -71,8 +71,10 @@ void WebListener::disableWeb ()
 }
 void WebListener::commandCallback (const std_msgs::String& msg)
 {
-	if (webEnabled && (msg.data.find(';') == std::string::npos)) {
-		system(("rosrun joint_trajectory file_playback.py -f " + msg.data).c_str());
+	string data = msg.data;
+	ROS_INFO("data");
+	if (webEnabled && (data.find(';') == std::string::npos)) {
+		system(("rosrun joint_trajectory file_playback.py -f " + data).c_str());
 	}
 }
 DrogonControlInterface::DrogonControlInterface()
