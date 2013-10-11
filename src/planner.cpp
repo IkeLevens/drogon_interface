@@ -18,9 +18,12 @@ int main(int argc, char** argv)
 	dci->rosEnable();
 	map<string, double> goal;
 	fillMap(goal, argv[1]);
-//	moveit::planning_interface::MoveGroup::Plan plan = dci->getPlan(goal, drogon::LEFT);
-//	dci->executePlan(plan, drogon::LEFT);
-	ros::waitForShutdown();
+	sleep(5000);
+	moveit::planning_interface::MoveGroup::Plan plan = dci->getPlan(goal, drogon::LEFT);
+	cout << "plan received" << endl;
+	dci->executePlan(plan, drogon::LEFT);
+	cout << "plan executed" << endl;
+	ros::spin();
 }
 void fillMap(map<string, double> &goal, string filename)
 {
@@ -28,8 +31,8 @@ void fillMap(map<string, double> &goal, string filename)
 	cout << filename.c_str() << endl;
 	goalInput.open(filename.c_str());
 	string line;
-	while(!goalInput.eof()) {
-		getline(goalInput, line);
+	while(getline(goalInput, line)) {
+		cout << "outer loop:: " << endl;
 		cout << line << endl;
 		stringstream lineStream(line);
 		string key;
