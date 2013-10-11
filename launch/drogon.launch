@@ -1,10 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <launch>
+	<!-- input arguments -->
+	<arg name="debug" default="false" />
+	<arg name="allow_trajectory_execution" default="true"/>
+	
+	<include file="$(find baxter_control)/launch/baxter_hardware.launch"/>
+
+	<!-- load urdf, srdf -->
 	<include file="$(find baxter_moveit_config)/launch/planning_context.launch">
 		<arg name="load_robot_description" value="true"/>
 	</include>
 
+	<!-- start move_group -->
 	<include file="$(find baxter_moveit_config)/launch/move_group.launch">
-		<arg name="allow_trajectory_execution" value="true"/>
+		<arg name="allow_trajectory_execution" value="$(arg allow_trajectory_execution)"/>
+		<arg name="debug" value="$(arg debug)"/>
+		<arg name="info" value="true"/>
 	</include>
 
 	<rosparam command="load" file="$(find baxter_moveit_config)/config/kinematics.yaml"/>
