@@ -4,7 +4,7 @@
 	</include>
 
 	<include file="$(find baxter_moveit_config)/launch/move_group.launch">
-		<arg name="allow_trajectory_execution" value="false"/>
+		<arg name="allow_trajectory_execution" value="true"/>
 	</include>
 
 	<rosparam command="load" file="$(find baxter_moveit_config)/config/kinematics.yaml"/>

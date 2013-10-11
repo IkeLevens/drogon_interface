@@ -101,6 +101,7 @@ DrogonControlInterface::DrogonControlInterface()
 	}
 	ros::AsyncSpinner spinner(2);
 	spinner.start();
+	rosEnable();
 	setupRobotModel();
 }
 ros::ServiceClient DrogonControlInterface::getIKServiceClient(int arm, ros::NodeHandle& n)
@@ -208,6 +209,7 @@ void DrogonControlInterface::setupRobotModel()
 	leftArmGroup = model->getJointModelGroup("left_arm");
 	rightArmGroup = model->getJointModelGroup("right_arm");
 	setupMoveGroups();
+	ROS_INFO("successfully created MoveGroup");
 }
 void DrogonControlInterface::rosEnable()
 {
