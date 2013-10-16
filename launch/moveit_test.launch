@@ -2,7 +2,7 @@
 <launch>
 	<!-- input arguments -->
 	<arg name="file" default="/home/pracsys/test.txt" />
-	<arg name="debug" default="true" />
+	<arg name="debug" default="false" />
 	<arg name="allow_trajectory_execution" default="true"/>
 	
 	<include file="$(find baxter_control)/launch/baxter_hardware.launch"/>
@@ -23,7 +23,6 @@
 
 	<node name="TrajectoryController" pkg="baxter_interface" type="trajectory_controller.py" respawn="false" output="screen"/>
 
-	<node name="planner" pkg="drogon_interface" type="planner" respawn="false" args="$(arg file)" output="screen"/>
+	<node name="planner" pkg="drogon_interface" type="moveit_test" respawn="false" args="$(arg file)" output="screen"/>
 
 </launch>
-

@@ -84,7 +84,7 @@ add_library(drogon_interface_library
 
 ## Declare a cpp executable
 add_executable(drogon_interface_node src/DrogonControlInterfaceKeyboard.cpp)
-add_executable(ik_test src/test.cpp)
+add_executable(moveit_test src/test.cpp)
 add_executable(planner src/planner.cpp)
 add_executable(drogon_web_server src/WebServer.cpp)
 
@@ -100,8 +100,7 @@ target_link_libraries(drogon_interface_node
 target_link_libraries(drogon_interface_library
 	${catkin_LIBRARIES}
 )
-target_link_libraries(ik_test
-	drogon_interface_library
+target_link_libraries(moveit_test
 	${catkin_LIBRARIES}
 )
 target_link_libraries(planner

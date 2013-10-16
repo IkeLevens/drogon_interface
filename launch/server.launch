@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <launch>
 	<node name="TrajectoryController" pkg="baxter_interface" type="trajectory_controller.py" respawn="false" output="screen"/>
 

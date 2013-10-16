@@ -79,6 +79,9 @@ void WebListener::commandCallback (const std_msgs::String& msg)
 }
 DrogonControlInterface::DrogonControlInterface()
 {
+	ros::AsyncSpinner spinner(4);
+	spinner.start();
+	rosEnable();
 	leftArmPub = getArmPublisher(LEFT, n);
 	rightArmPub = getArmPublisher(RIGHT, n);
 	leftVelocityPub = getVelocityPublisher(LEFT, n);
@@ -99,9 +102,6 @@ DrogonControlInterface::DrogonControlInterface()
 		ROS_INFO("Waiting for service");
 		sleep(1.0);
 	}
-	ros::AsyncSpinner spinner(2);
-	spinner.start();
-	rosEnable();
 	setupRobotModel();
 }
 ros::ServiceClient DrogonControlInterface::getIKServiceClient(int arm, ros::NodeHandle& n)
@@ -520,18 +520,23 @@ bool DrogonControlInterface::closeEnough(map<string, double> &goal, map<string, 
 }
 void DrogonControlInterface::setupMoveGroups()
 {
-	move_group_interface::MoveGroup temp("left_arm");
-	leftArmPlanner = &temp;
-	move_group_interface::MoveGroup temp1("right_arm");
-	rightArmPlanner = &temp1;
+	move_group_interface::MoveGroup temp1("left_arm");
+	leftArmPlanner = &temp1;
+	move_group_interface::MoveGroup temp2("right_arm");
+	rightArmPlanner = &temp2;
 }
 moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const int arm)
 {
+	ROS_INFO("DrogonControlInterface::getPlan(goal, arm)");
 	moveit::planning_interface::MoveGroup::Plan plan;
+	ROS_INFO("plan created");
 	if (arm == LEFT) {
 		leftArmPlanner->setStartStateToCurrentState();
-		leftArmPlanner->setJointValueTarget(goal);
-		leftArmPlanner->plan(plan);
+		ROS_INFO("start state set to current state");
+		leftArmPlanner->setRandomTarget();
+		ROS_INFO("joint value target set to goal");
+		leftArmPlanner->move();
+		ROS_INFO("plan generated");
 	} else {
 		rightArmPlanner->setStartStateToCurrentState();
 		rightArmPlanner->setJointValueTarget(goal);
@@ -562,6 +567,10 @@ void DrogonControlInterface::executePlan(const moveit::planning_interface::MoveG
 	} else {
 		rightArmPlanner->execute(plan);
 	}
+}
+vector<string> DrogonControlInterface::getJointNames()
+{
+	return leftArmPlanner->getJoints();
 }
 void DrogonControlInterface::enableWebServer()
 {

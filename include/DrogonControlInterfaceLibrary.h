@@ -195,6 +195,8 @@ class DrogonControlInterface
 	// cartesian location of an end effector
 	void setupMoveGroups(); // this sets move groups for motion planning
 	void executePlan(const moveit::planning_interface::MoveGroup::Plan &plan, const int arm); // this executes the plan
+	// Get the names of the joints from the MoveGroup.
+	vector<string> getJointNames();
 	// which is passed by reference as an argument to parameter plan.
 	moveit::planning_interface::MoveGroup::Plan getPlan(const map<string, double> &goal, const int arm); // this returns a motion plan from the
 	// current robot's current configuration to the goal configuration.

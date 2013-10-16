@@ -9,21 +9,27 @@ int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "Drogon_Planner");
 	if (argc < 2) {
-		printf("a file name is required./n");
+		ROS_WARN("a file name is required.\n");
 		return -1;
 	}
-	cout << "creating DrogonControlInterface" << endl;
+	ROS_INFO("creating DrogonControlInterface\n");
 	dci = new DrogonControlInterface();
-	cout << "created DrogonControlInterface" << endl;
+	sleep(10);
+	ROS_INFO("created DrogonControlInterface\n");
 	dci->rosEnable();
 	map<string, double> goal;
 	fillMap(goal, argv[1]);
-	sleep(5000);
+	//vector<string> joints = dci->getJointNames();
+	//for (std::vector<string>::iterator it = joints.begin(); it != joints.end(); ++it)  {
+	//	ROS_INFO(it->c_str());
+	//}
+	ROS_INFO("requesting plan\n");
 	moveit::planning_interface::MoveGroup::Plan plan = dci->getPlan(goal, drogon::LEFT);
-	cout << "plan received" << endl;
-	dci->executePlan(plan, drogon::LEFT);
-	cout << "plan executed" << endl;
+	ROS_INFO("plan received\n");
+//	dci->executePlan(plan, drogon::LEFT);
+	ROS_INFO("plan executed\n");
 	ros::spin();
+	return 0;
 }
 void fillMap(map<string, double> &goal, string filename)
 {
@@ -32,8 +38,8 @@ void fillMap(map<string, double> &goal, string filename)
 	goalInput.open(filename.c_str());
 	string line;
 	while(getline(goalInput, line)) {
-		cout << "outer loop:: " << endl;
-		cout << line << endl;
+		ROS_INFO("outer loop:: \n");
+		ROS_INFO(line.c_str());
 		stringstream lineStream(line);
 		string key;
 		string valueString;
