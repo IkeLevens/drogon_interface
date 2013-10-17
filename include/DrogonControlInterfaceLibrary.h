@@ -204,6 +204,7 @@ class DrogonControlInterface
 	// this returns a motion plan from the start configuration to the goal configuration.
 	void enableWebServer ();
 	void disableWebServer ();
+	void waitForMoveit ();
 };
 
 #endif

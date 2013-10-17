@@ -561,7 +561,7 @@ moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(cons
 void DrogonControlInterface::executePlan(const moveit::planning_interface::MoveGroup::Plan &plan, const int arm)
 {
 	if (arm == LEFT) {
-		leftArmPlanner->execute(plan);
+		leftArmPlanner->move();
 	} else {
 		rightArmPlanner->execute(plan);
 	}
@@ -577,4 +577,11 @@ void DrogonControlInterface::enableWebServer()
 void DrogonControlInterface::disableWebServer()
 {
 	webListener.disableWeb();
+}
+void DrogonControlInterface::waitForMoveit ()
+{
+	ROS_INFO("Planner waiting for MoveIt! server to come up.");
+	ros::service::waitForService("/move_group/plan_execution/set_parameters");
+	sleep(5);
+	ROS_INFO("Finished waiting for MoveIt! server to come up.");
 }

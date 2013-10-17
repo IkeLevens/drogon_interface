@@ -19,12 +19,22 @@ int main(int argc, char** argv)
 	// this connecs to a running instance of the move_group node
 	move_group_interface::MoveGroup group("left_arm");
 	group.setStartStateToCurrentState();
-	// specify that our target will be a random one
-	double temp[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	// specify our target
 	vector<double> goal;
+	double temp[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	goal.assign(temp, temp+7);
 	group.setJointValueTarget(goal);
 	// plan the motion and then move the group to the sampled target 
+	group.move();
+	group.setStartStateToCurrentState();
+	double temp1[] = {0.7, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0};
+	goal.assign(temp1, temp1+7);
+	group.setJointValueTarget(goal);
+	group.move();
+	group.setStartStateToCurrentState();
+	double temp2[] = {-0.7, 0.0, -0.7, 0.0, 0.0, 0.0, 0.0};
+	goal.assign(temp2, temp2+7);
+	group.setJointValueTarget(goal);
 	group.move();
 	ros::waitForShutdown();
 }
