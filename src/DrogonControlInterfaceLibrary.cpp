@@ -544,24 +544,24 @@ moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(cons
 }
 moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const map<string, double> &start, const int arm)
 {
-	moveit::planning_interface::MoveGroup::Plan plan;
+	moveit::planning_interface::MoveGroup::Plan* plan = new moveit::planning_interface::MoveGroup::Plan();
 	moveit::core::RobotState startState(model);
 	startState.setVariablePositions(start);
 	if (arm == LEFT) {
 		leftArmPlanner->setStartState(startState);
 		leftArmPlanner->setJointValueTarget(goal);
-		leftArmPlanner->plan(plan);
+		leftArmPlanner->plan(*plan);
 	} else {
 		rightArmPlanner->setStartState(startState);
 		rightArmPlanner->setJointValueTarget(goal);
-		rightArmPlanner->plan(plan);
+		rightArmPlanner->plan(*plan);
 	}
-	return plan;
+	return *plan;
 }
 void DrogonControlInterface::executePlan(const moveit::planning_interface::MoveGroup::Plan &plan, const int arm)
 {
 	if (arm == LEFT) {
-		leftArmPlanner->move();
+		leftArmPlanner->execute(plan);
 	} else {
 		rightArmPlanner->execute(plan);
 	}

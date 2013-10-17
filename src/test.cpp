@@ -27,12 +27,12 @@ int main(int argc, char** argv)
 	// plan the motion and then move the group to the sampled target 
 	group.move();
 	group.setStartStateToCurrentState();
-	double temp1[] = {0.7, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0};
+	double temp1[] = {-0.7, 0.0, -0.7, 0.0, 0.0, 0.0, 0.0};
 	goal.assign(temp1, temp1+7);
 	group.setJointValueTarget(goal);
 	group.move();
 	group.setStartStateToCurrentState();
-	double temp2[] = {-0.7, 0.0, -0.7, 0.0, 0.0, 0.0, 0.0};
+	double temp2[] = {0.7, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0};
 	goal.assign(temp2, temp2+7);
 	group.setJointValueTarget(goal);
 	group.move();
