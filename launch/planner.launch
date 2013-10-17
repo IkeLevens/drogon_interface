@@ -2,7 +2,7 @@
 <launch>
 	<!-- input arguments -->
 	<arg name="file" default="/home/pracsys/test.txt" />
-	<arg name="debug" default="true" />
+	<arg name="debug" default="false" />
 	<arg name="allow_trajectory_execution" default="true"/>
 	
 	<include file="$(find baxter_control)/launch/baxter_hardware.launch"/>

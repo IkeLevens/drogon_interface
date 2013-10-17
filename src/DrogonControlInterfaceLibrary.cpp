@@ -520,10 +520,8 @@ bool DrogonControlInterface::closeEnough(map<string, double> &goal, map<string, 
 }
 void DrogonControlInterface::setupMoveGroups()
 {
-	move_group_interface::MoveGroup temp1("left_arm");
-	leftArmPlanner = &temp1;
-	move_group_interface::MoveGroup temp2("right_arm");
-	rightArmPlanner = &temp2;
+	leftArmPlanner = new move_group_interface::MoveGroup("left_arm");
+	rightArmPlanner = new move_group_interface::MoveGroup("right_arm");
 }
 moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const int arm)
 {
@@ -533,9 +531,9 @@ moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(cons
 	if (arm == LEFT) {
 		leftArmPlanner->setStartStateToCurrentState();
 		ROS_INFO("start state set to current state");
-		leftArmPlanner->setRandomTarget();
+		leftArmPlanner->setJointValueTarget(goal);
 		ROS_INFO("joint value target set to goal");
-		leftArmPlanner->move();
+		leftArmPlanner->plan(plan);
 		ROS_INFO("plan generated");
 	} else {
 		rightArmPlanner->setStartStateToCurrentState();
