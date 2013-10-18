@@ -523,26 +523,26 @@ void DrogonControlInterface::setupMoveGroups()
 	leftArmPlanner = new move_group_interface::MoveGroup("left_arm");
 	rightArmPlanner = new move_group_interface::MoveGroup("right_arm");
 }
-moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const int arm)
+moveit::planning_interface::MoveGroup::Plan* DrogonControlInterface::getPlan(const map<string, double> &goal, const int arm)
 {
 	ROS_INFO("DrogonControlInterface::getPlan(goal, arm)");
-	moveit::planning_interface::MoveGroup::Plan plan;
+	moveit::planning_interface::MoveGroup::Plan* plan = new moveit::planning_interface::MoveGroup::Plan();
 	ROS_INFO("plan created");
 	if (arm == LEFT) {
 		leftArmPlanner->setStartStateToCurrentState();
 		ROS_INFO("start state set to current state");
 		leftArmPlanner->setJointValueTarget(goal);
 		ROS_INFO("joint value target set to goal");
-		leftArmPlanner->plan(plan);
+		leftArmPlanner->plan(*plan);
 		ROS_INFO("plan generated");
 	} else {
 		rightArmPlanner->setStartStateToCurrentState();
 		rightArmPlanner->setJointValueTarget(goal);
-		rightArmPlanner->plan(plan);
+		rightArmPlanner->plan(*plan);
 	}
 	return plan;
 }
-moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(const map<string, double> &goal, const map<string, double> &start, const int arm)
+moveit::planning_interface::MoveGroup::Plan* DrogonControlInterface::getPlan(const map<string, double> &goal, const map<string, double> &start, const int arm)
 {
 	moveit::planning_interface::MoveGroup::Plan* plan = new moveit::planning_interface::MoveGroup::Plan();
 	moveit::core::RobotState startState(model);
@@ -556,7 +556,7 @@ moveit::planning_interface::MoveGroup::Plan DrogonControlInterface::getPlan(cons
 		rightArmPlanner->setJointValueTarget(goal);
 		rightArmPlanner->plan(*plan);
 	}
-	return *plan;
+	return plan;
 }
 void DrogonControlInterface::executePlan(const moveit::planning_interface::MoveGroup::Plan &plan, const int arm)
 {

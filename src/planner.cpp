@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 	ROS_INFO("creating DrogonControlInterface\n");
 	dci = new DrogonControlInterface();
 	ROS_INFO("created DrogonControlInterface\n");
-	dci->waitForMoveit();
+//	dci->waitForMoveit();
 	dci->rosEnable();
 	map<string, double> goal;
 	fillMap(goal, argv[1]);
@@ -32,9 +32,9 @@ int main(int argc, char** argv)
 		ss.str("");
 	}
 	ROS_INFO("requesting plan\n");
-	moveit::planning_interface::MoveGroup::Plan plan = dci->getPlan(goal, drogon::LEFT);
+	moveit::planning_interface::MoveGroup::Plan* plan = dci->getPlan(goal, drogon::LEFT);
 	ROS_INFO("plan received\n");
-	dci->executePlan(plan, drogon::LEFT);
+	dci->executePlan(*plan, drogon::LEFT);
 	ROS_INFO("plan executed\n");
 	ros::spin();
 	return 0;

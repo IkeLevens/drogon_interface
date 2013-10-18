@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+	<!-- input arguments -->
+	<arg name="file" default="/home/pracsys/test.txt" />
+	<arg name="debug" default="false" />
+	<arg name="allow_trajectory_execution" default="true"/>
+	
+	<include file="$(find baxter_control)/launch/baxter_hardware.launch"/>
+
+	<!-- load urdf, srdf -->
+	<include file="$(find baxter_moveit_config)/launch/planning_context.launch">
+		<arg name="load_robot_description" value="true"/>
+	</include>
+
+	<!-- start move_group -->
+	<include file="$(find baxter_moveit_config)/launch/move_group.launch">
+		<arg name="allow_trajectory_execution" value="$(arg allow_trajectory_execution)"/>
+		<arg name="debug" value="$(arg debug)"/>
+		<arg name="info" value="true"/>
+	</include>
+
+	<!-- load parameters for Inverse Kinematics Solvers -->
+	<rosparam command="load" file="$(find baxter_moveit_config)/config/kinematics.yaml"/>
+
+	<!-- start Baxter Trajectory controller -->
+	<node name="TrajectoryController" pkg="baxter_interface" type="trajectory_controller.py" respawn="false" output="screen"/>
+
+</launch>
