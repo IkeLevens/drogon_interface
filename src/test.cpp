@@ -5,6 +5,9 @@
  * Created on August 29, 2013, 10:08 AM
  */
 #include <moveit/move_group_interface/move_group.h>
+#include <moveit_msgs/RobotTrajectory.h>
+#include <trajectory_msgs/JointTrajectory.h>
+#include <trajectory_msgs/MultiDOFJointTrajectory.h>
 #include <cstdlib>			//standard library for C/C++
 #include <iostream>
 #include <fstream>
@@ -22,7 +25,7 @@ int main(int argc, char** argv)
 	sleep(15);
 	// this connecs to a running instance of the move_group node
 	move_group_interface::MoveGroup group("left_arm");
-/*	group.setStartStateToCurrentState();
+	group.setStartStateToCurrentState();
 	// specify our target
 	vector<double> goal;
 	double temp[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -39,7 +42,7 @@ int main(int argc, char** argv)
 	double temp2[] = {0.7, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0};
 	goal.assign(temp2, temp2+7);
 	group.setJointValueTarget(goal);
-	group.move();*/
+	group.move();
 	group.setStartStateToCurrentState();
 	map<string, double> goal2;
 	fillMap(goal2, "test.txt");
@@ -47,6 +50,10 @@ int main(int argc, char** argv)
 //	group.move();
 	moveit::planning_interface::MoveGroup::Plan plan;
 	group.plan(plan);
+//	ros::NodeHandle nh;
+//	ros::Publisher pub = nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>("/test", 1, false);
+//	pub.publish(plan.trajectory_.multi_dof_joint_trajectory);
+//	cout << plan.trajectory_.multi_dof_joint_trajectory << "was the multidofjointtrajectory" << endl;
 	group.execute(plan);
 	ros::waitForShutdown();
 }
@@ -70,4 +77,31 @@ void fillMap(map<string, double> &goal, string filename)
 		}
 	}
 	goalInput.close();
+}
+void savePlan(string filename, moveit::planning_interface::MoveGroup::Plan* plan)
+{
+	ofstream planOutput;
+	planOutput << "time";
+	planOutput.open(filename.c_str());
+	int jointCount = 0;
+	for (vector<string>::iterator it = plan->trajectory_.multi_dof_joint_trajectory.joint_names.begin();
+			it != plan->trajectory_.multi_dof_joint_trajectory.joint_names.end(); ++it) {
+		planOutput << "," << *it;
+		++jointCount;
+	}
+	planOutput << "\n";
+	/*for () {
+		double timeStamp = plan->trajectory_.getWaypointDurationFromStart(wp);
+		current = plan->trajectory_.getWaypoint(wp);
+		stringstream linestream;
+		linestream << timeStamp;
+		double* positions = current.getVariablePositions();
+		for (int c = 0; c < jointCount; ++c) {
+			linestream << "," << positions[c];
+		}
+		linestream << "\n";
+		planOutput << linestream.str();
+	}*/
+
+	planOutput.close();
 }

@@ -1,3 +1,14 @@
+#include <cstdlib>			//standard library for C/C++
+#include <iostream>			//input and output stream packages
+#include <fstream>			//file input stream tools for C/C+
+#include <sstream>			//For sending topic messages in ROS
+#include <ros/ros.h>		//Headers for ros
+#include <moveit/move_group_interface/move_group.h>
+#include <moveit/robot_model_loader/robot_model_loader.h>	//moveIt! includes
+#include <moveit/robot_model/robot_model.h>
+#include <moveit/robot_state/robot_state.h>
+#include <moveit/robot_model/joint_model_group.h>
+#include <moveit_msgs/RobotTrajectory.h>
 #include <DrogonControlInterfaceLibrary.h>
 
 using namespace std;
@@ -60,3 +71,33 @@ void fillMap(map<string, double> &goal, string filename)
 	}
 	goalInput.close();
 }
+/*
+void savePlan(string filename, moveit::planning_interface::MoveGroup::Plan* plan)
+{
+	ofstream planOutput;
+	planOutput << "time";
+	planOutput.open(filename.c_str());
+	robot_state::RobotState current = plan->trajectory_.getWaypoint(0);
+	vector<string> names = current.getVariableNames();
+	int wpCount = 1; //get the count of the waypoints in plan.
+	int jointCount = 0;
+	for (vector<string>::iterator it = names.begin(); it != names.end(); ++it) {
+		planOutput << "," << *it;
+		++jointCount;
+	}
+	planOutput << "\n";
+	for (int wp = 0; wp < wpCount; ++wp) {
+		double timeStamp = plan->trajectory_.getWaypointDurationFromStart(wp);
+		current = plan->trajectory_.getWaypoint(wp);
+		stringstream linestream;
+		linestream << timeStamp;
+		double* positions = current.getVariablePositions();
+		for (int c = 0; c < jointCount; ++c) {
+			linestream << "," << dtos(positions[c];
+		}
+		linestream << "\n";
+		planOutput << linstream.str();
+	}
+	planOutput.close();
+}
+*/
