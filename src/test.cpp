@@ -11,10 +11,14 @@
 #include <cstdlib>			//standard library for C/C++
 #include <iostream>
 #include <fstream>
+#include <boost/foreach.hpp>
 
 using namespace std;
 
 void fillMap(map<string, double> &goal, string filename);
+void savePlan(string filename, moveit::planning_interface::MoveGroup::Plan* plan);
+string input = "test.txt";
+string output = "testingPlanSaver.trj";
 
 int main(int argc, char** argv)
 {
@@ -22,10 +26,10 @@ int main(int argc, char** argv)
 	// start a ROS spinning thread
 	ros::AsyncSpinner spinner(1);
 	spinner.start();
-	sleep(15);
+//	sleep(15);
 	// this connecs to a running instance of the move_group node
 	move_group_interface::MoveGroup group("left_arm");
-	group.setStartStateToCurrentState();
+/*	group.setStartStateToCurrentState();
 	// specify our target
 	vector<double> goal;
 	double temp[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -42,23 +46,32 @@ int main(int argc, char** argv)
 	double temp2[] = {0.7, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0};
 	goal.assign(temp2, temp2+7);
 	group.setJointValueTarget(goal);
-	group.move();
+	group.move();*/
 	group.setStartStateToCurrentState();
 	map<string, double> goal2;
-	fillMap(goal2, "test.txt");
+	fillMap(goal2, input);
+	ROS_INFO("setting target");
 	group.setJointValueTarget(goal2);
 //	group.move();
 	moveit::planning_interface::MoveGroup::Plan plan;
+//	group.setRandomTarget();
+	ROS_INFO("requesting plan.");
 	group.plan(plan);
+	ROS_INFO("plan received.");
 //	ros::NodeHandle nh;
 //	ros::Publisher pub = nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>("/test", 1, false);
 //	pub.publish(plan.trajectory_.multi_dof_joint_trajectory);
-//	cout << plan.trajectory_.multi_dof_joint_trajectory << "was the multidofjointtrajectory" << endl;
-	group.execute(plan);
+	cout << plan.trajectory_.joint_trajectory << "was the jointtrajectory" << endl;
+	cout << "saving plan as: " << output << endl;
+	savePlan(output, &plan);
+	ROS_INFO("executing plan");
+//	group.execute(plan);
+	ROS_INFO("plan execution completed.");
 	ros::waitForShutdown();
 }
 void fillMap(map<string, double> &goal, string filename)
 {
+	ROS_INFO("filling map");
 	ifstream goalInput;
 	cout << filename.c_str() << endl;
 	goalInput.open(filename.c_str());
@@ -74,6 +87,7 @@ void fillMap(map<string, double> &goal, string filename)
 			lineStream >> valueString;
 			value = atof(valueString.c_str());
 			goal[key] = value;
+			ROS_INFO((key + ": " + valueString).c_str());
 		}
 	}
 	goalInput.close();
@@ -81,27 +95,22 @@ void fillMap(map<string, double> &goal, string filename)
 void savePlan(string filename, moveit::planning_interface::MoveGroup::Plan* plan)
 {
 	ofstream planOutput;
-	planOutput << "time";
 	planOutput.open(filename.c_str());
-	int jointCount = 0;
-	for (vector<string>::iterator it = plan->trajectory_.multi_dof_joint_trajectory.joint_names.begin();
-			it != plan->trajectory_.multi_dof_joint_trajectory.joint_names.end(); ++it) {
+	planOutput << "time";
+	for(vector<string>::iterator it =  plan->trajectory_.joint_trajectory.joint_names.begin();
+			it !=  plan->trajectory_.joint_trajectory.joint_names.end(); it++) {
 		planOutput << "," << *it;
-		++jointCount;
 	}
 	planOutput << "\n";
-	/*for () {
-		double timeStamp = plan->trajectory_.getWaypointDurationFromStart(wp);
-		current = plan->trajectory_.getWaypoint(wp);
-		stringstream linestream;
-		linestream << timeStamp;
-		double* positions = current.getVariablePositions();
-		for (int c = 0; c < jointCount; ++c) {
-			linestream << "," << positions[c];
+	for(vector<trajectory_msgs::JointTrajectoryPoint>::iterator pt =  plan->trajectory_.joint_trajectory.points.begin();
+			pt !=  plan->trajectory_.joint_trajectory.points.end(); pt++) {
+		double secs = (*pt).time_from_start.toSec();
+		stringstream pointStream;
+		pointStream << secs;
+		for(vector<double>::iterator dt = (*pt).positions.begin(); dt != (*pt).positions.end(); dt++) {
+			pointStream << "," << *dt;
 		}
-		linestream << "\n";
-		planOutput << linestream.str();
-	}*/
-
+		planOutput << pointStream.str() << "\n";
+	}
 	planOutput.close();
 }
