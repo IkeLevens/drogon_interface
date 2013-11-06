@@ -8,10 +8,11 @@
 #include <moveit_msgs/RobotTrajectory.h>
 #include <trajectory_msgs/JointTrajectory.h>
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
+#include <geometry_msgs/Pose.h>
 #include <cstdlib>			//standard library for C/C++
 #include <iostream>
 #include <fstream>
-#include <boost/foreach.hpp>
+#include <boost/tokenizer.hpp>
 
 using namespace std;
 
@@ -26,46 +27,33 @@ int main(int argc, char** argv)
 	// start a ROS spinning thread
 	ros::AsyncSpinner spinner(1);
 	spinner.start();
-//	sleep(15);
 	// this connecs to a running instance of the move_group node
-	move_group_interface::MoveGroup group("left_arm");
-/*	group.setStartStateToCurrentState();
-	// specify our target
-	vector<double> goal;
-	double temp[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-	goal.assign(temp, temp+7);
-	group.setJointValueTarget(goal);
-	// plan the motion and then move the group to the sampled target 
-	group.move();
-	group.setStartStateToCurrentState();
-	double temp1[] = {-0.7, 0.0, -0.7, 0.0, 0.0, 0.0, 0.0};
-	goal.assign(temp1, temp1+7);
-	group.setJointValueTarget(goal);
-	group.move();
-	group.setStartStateToCurrentState();
-	double temp2[] = {0.7, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0};
-	goal.assign(temp2, temp2+7);
-	group.setJointValueTarget(goal);
-	group.move();*/
+	move_group_interface::MoveGroup group("both_arms");
+	group.setPlannerId("PRMstarkConfigDefault");
 	group.setStartStateToCurrentState();
 	map<string, double> goal2;
 	fillMap(goal2, input);
 	ROS_INFO("setting target");
-	group.setJointValueTarget(goal2);
+	group.setJointValueTarget(goal2); //Set target by joint target
+/*	group.setEndEffector("left_hand_eef");
+	geometry_msgs::Pose pose;
+	pose.position.x = 0.5;
+	pose.position.y = 0.5;
+	pose.position.z = 0.5;
+	pose.orientation.x = 0;
+	pose.orientation.y = 0;
+	pose.orientation.z = 0;
+	pose.orientation.w = 1;
+	group.setPoseTarget(pose); //Set target by pose*/
 //	group.move();
 	moveit::planning_interface::MoveGroup::Plan plan;
-//	group.setRandomTarget();
 	ROS_INFO("requesting plan.");
 	group.plan(plan);
 	ROS_INFO("plan received.");
-//	ros::NodeHandle nh;
-//	ros::Publisher pub = nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>("/test", 1, false);
-//	pub.publish(plan.trajectory_.multi_dof_joint_trajectory);
-	cout << plan.trajectory_.joint_trajectory << "was the jointtrajectory" << endl;
 	cout << "saving plan as: " << output << endl;
 	savePlan(output, &plan);
 	ROS_INFO("executing plan");
-//	group.execute(plan);
+	group.execute(plan);
 	ROS_INFO("plan execution completed.");
 	ros::waitForShutdown();
 }
@@ -75,20 +63,28 @@ void fillMap(map<string, double> &goal, string filename)
 	ifstream goalInput;
 	cout << filename.c_str() << endl;
 	goalInput.open(filename.c_str());
-	string line;
-	while(getline(goalInput, line)) {
-//		ROS_INFO("outer loop:: \n");
-//		ROS_INFO(line.c_str());
-		stringstream lineStream(line);
-		string key;
-		string valueString;
-		double value;
-		while (lineStream >> key) {
-			lineStream >> valueString;
-			value = atof(valueString.c_str());
-			goal[key] = value;
-			ROS_INFO((key + ": " + valueString).c_str());
+	string keyLine;
+	string valueLine;
+	getline(goalInput, keyLine);
+	getline(goalInput, valueLine);
+	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+	boost::char_separator<char> commaDelimited(",");
+	tokenizer keys(keyLine, commaDelimited);
+	tokenizer values(valueLine, commaDelimited);
+	double value;
+	tokenizer::iterator value_iter = values.begin();
+	for (tokenizer::iterator key_iter = keys.begin();
+		key_iter != keys.end() && value_iter != values.end(); ++key_iter)
+	{
+		if ((*key_iter) == "time" || (*key_iter) == "left_gripper" || (*key_iter) == "right_gripper") 
+		{
+			++value_iter;
+			continue;
 		}
+		cout << *key_iter << endl;
+		value = atof((*value_iter).c_str());
+		goal[*key_iter] = value;
+		++value_iter;
 	}
 	goalInput.close();
 }
