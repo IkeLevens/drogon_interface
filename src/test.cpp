@@ -35,17 +35,6 @@ int main(int argc, char** argv)
 	fillMap(goal2, input);
 	ROS_INFO("setting target");
 	group.setJointValueTarget(goal2); //Set target by joint target
-/*	group.setEndEffector("left_hand_eef");
-	geometry_msgs::Pose pose;
-	pose.position.x = 0.5;
-	pose.position.y = 0.5;
-	pose.position.z = 0.5;
-	pose.orientation.x = 0;
-	pose.orientation.y = 0;
-	pose.orientation.z = 0;
-	pose.orientation.w = 1;
-	group.setPoseTarget(pose); //Set target by pose*/
-//	group.move();
 	moveit::planning_interface::MoveGroup::Plan plan;
 	ROS_INFO("requesting plan.");
 	group.plan(plan);
@@ -55,7 +44,7 @@ int main(int argc, char** argv)
 	ROS_INFO("executing plan");
 	group.execute(plan);
 	ROS_INFO("plan execution completed.");
-	ros::waitForShutdown();
+	return 0;
 }
 void fillMap(map<string, double> &goal, string filename)
 {

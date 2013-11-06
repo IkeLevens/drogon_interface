@@ -87,6 +87,7 @@ add_executable(drogon_interface_node src/DrogonControlInterfaceKeyboard.cpp)
 add_executable(moveit_test src/test.cpp)
 add_executable(planner src/planner.cpp)
 add_executable(drogon_web_server src/WebServer.cpp)
+add_executable(ik_test src/iktest.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -110,6 +111,10 @@ target_link_libraries(planner
 target_link_libraries(drogon_web_server
 	drogon_interface_library
 	${catkin_LIBRARIERS}
+)
+target_link_libraries(ik_test
+	${catkin_LIBRARIES}
+	drogon_interface_library
 )
 
 #############
