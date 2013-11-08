@@ -88,6 +88,7 @@ add_executable(moveit_test src/test.cpp)
 add_executable(planner src/planner.cpp)
 add_executable(drogon_web_server src/WebServer.cpp)
 add_executable(ik_test src/iktest.cpp)
+add_executable(hard_test src/hardcodetest.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -113,6 +114,10 @@ target_link_libraries(drogon_web_server
 	${catkin_LIBRARIERS}
 )
 target_link_libraries(ik_test
+	${catkin_LIBRARIES}
+	drogon_interface_library
+)
+target_link_libraries(hard_test
 	${catkin_LIBRARIES}
 	drogon_interface_library
 )
