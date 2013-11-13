@@ -1,8 +1,8 @@
 /* 
- * File:   iktest.cpp
+ * File:   hardcodetest.cpp
  * Author: Isaac Yochelson
  *
- * Created on August 29, 2013, 10:08 AM
+ * Created on August 11, 2013, 2:00 PM
  */
 #include <moveit/move_group_interface/move_group.h>
 #include <moveit_msgs/RobotTrajectory.h>
