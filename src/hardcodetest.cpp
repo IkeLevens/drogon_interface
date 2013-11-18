@@ -34,14 +34,34 @@ int main(int argc, char** argv)
 	rightGroup.setPlannerId("PRMstarkConfigDefault");
 	rightGroup.setStartStateToCurrentState();
 	ROS_INFO("setting target");
-	pick(5, leftGroup, "left_wrist");
-	place(0, leftGroup, "left_wrist");
-	pick(-3, rightGroup, "right_wrist");
+	for (int ct = 1; ct < 5; ++ct) {
+		pick(ct, leftGroup, "left_wrist");
+		place(0, leftGroup, "left_wrist");
+		pick(-ct, rightGroup, "right_wrist");
+		place(0, rightGroup, "right_wrist");
+	}
+	/*
+	pick(-5, rightGroup, "right_wrist");
 	place(0, rightGroup, "right_wrist");
-	pick(2, leftGroup, "left_wrist");
+	pick(0, leftGroup, "left_wrist");
+	place(5, leftGroup, "left_wrist");
+	pick(4, leftGroup, "left_wrist");
 	place(0, leftGroup, "left_wrist");
 	pick(0, rightGroup, "right_wrist");
-	place(-3, rightGroup, "right_wrist");
+	place(-1, rightGroup, "right_wrist");
+	pick(-4, rightGroup, "right_wrist");
+	place(0, rightGroup, "right_wrist");
+	pick(0, leftGroup, "left_wrist");
+	place(1, leftGroup, "left_wrist");
+	pick(3, leftGroup, "left_wrist");
+	place(0, leftGroup, "left_wrist");
+	pick(0, rightGroup, "right_wrist");
+	place(-2, rightGroup, "right_wrist");
+	pick(-3, rightGroup, "right_wrist");
+	place(0, rightGroup, "right_wrist");
+	pick(0, leftGroup, "left_wrist");
+	place(2, leftGroup, "left_wrist");
+	*/
 	return 0;
 }
 void pick (int cup, move_group_interface::MoveGroup& group, string joint) {
@@ -52,7 +72,7 @@ void pick (int cup, move_group_interface::MoveGroup& group, string joint) {
 		arm = "right";
 	}
 	geometry_msgs::Pose* pose = new geometry_msgs::Pose;
-	pose->position.x = 0.82;
+	pose->position.x = 0.83;
 	pose->position.y = 0.104 * cup;
 	pose->position.z = 0.35;
 	pose->orientation.x = 0;
@@ -60,7 +80,7 @@ void pick (int cup, move_group_interface::MoveGroup& group, string joint) {
 	pose->orientation.z = 0;
 	pose->orientation.w = 0;
 	moveToPose(joint, group, pose);
-	pose->position.z = 0.14;
+	pose->position.z = 0.135;
 	moveToPose(joint, group, pose);
 	stringstream ss;
 	ss << "python /home/pracsys/workspaces/hydro_ws/src/drogon_interface/src/gripper.py close " << arm;
@@ -76,7 +96,7 @@ void place (int cup, move_group_interface::MoveGroup& group, string joint) {
 		arm = "right";
 	}
 	geometry_msgs::Pose* pose = new geometry_msgs::Pose;
-	pose->position.x = 0.82;
+	pose->position.x = 0.83;
 	pose->position.y = 0.104 * cup;
 	pose->position.z = 0.35;
 	pose->orientation.x = 0;
@@ -84,7 +104,7 @@ void place (int cup, move_group_interface::MoveGroup& group, string joint) {
 	pose->orientation.z = 0;
 	pose->orientation.w = 0;
 	moveToPose(joint, group, pose);
-	pose ->position.z = 0.19;
+	pose ->position.z = 0.20;
 	moveToPose(joint, group, pose);
 	stringstream ss;
 	ss << "python /home/pracsys/workspaces/hydro_ws/src/drogon_interface/src/gripper.py open " << arm;

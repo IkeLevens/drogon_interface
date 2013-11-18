@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 	ros::AsyncSpinner spinner(1);
 	spinner.start();
 	// this connecs to a running instance of the move_group node
-	move_group_interface::MoveGroup group("left_arm");
+	move_group_interface::MoveGroup group("right_arm");
 	group.setPlannerId("PRMstarkConfigDefault");
 	group.setStartStateToCurrentState();
 	ROS_INFO("setting target");
@@ -55,10 +55,10 @@ int main(int argc, char** argv)
 		pose.position.y = y;
 		pose.position.z = z;
 		pose.orientation.x = 0;
-		pose.orientation.y = 1;
+		pose.orientation.y = 0.8;
 		pose.orientation.z = 0;
-		pose.orientation.w = 0;
-		group.setPoseTarget(pose, "left_wrist");
+		pose.orientation.w = 0.6;
+		group.setPoseTarget(pose, "right_wrist");
 //		group.setPositionTarget(x, y , z, "left_wrist");
 		moveit::planning_interface::MoveGroup::Plan plan;
 		ROS_INFO("requesting plan.");
@@ -70,13 +70,6 @@ int main(int argc, char** argv)
 			ROS_INFO("executing plan");
 			group.execute(plan);
 			ROS_INFO("plan execution completed.");
-		}
-		if (closing) {
-			system("python /home/pracsys/workspaces/hydro_ws/src/drogon_interface/src/gripper.py close left");
-			closing = false;
-		} else {
-			system("python /home/pracsys/workspaces/hydro_ws/src/drogon_interface/src/gripper.py open left");
-			running = false;
 		}
 	}
 	ros::waitForShutdown();
