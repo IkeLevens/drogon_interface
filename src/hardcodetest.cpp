@@ -34,13 +34,22 @@ int main(int argc, char** argv)
 	rightGroup.setPlannerId("PRMstarkConfigDefault");
 	rightGroup.setStartStateToCurrentState();
 	ROS_INFO("setting target");
+	geometry_msgs::Pose* pose = new geometry_msgs::Pose;
+	pose->position.x = 0.2;
+	pose->position.y = 0.4;
+	pose->position.z = 0.3;
+	pose->orientation.x = 0;
+	pose->orientation.y = 1;
+	pose->orientation.z = 0;
+	pose->orientation.w = 0;
+	moveToPose("right_wrist", rightGroup, pose);
+	/*
 	for (int ct = 1; ct < 5; ++ct) {
 		pick(ct, leftGroup, "left_wrist");
 		place(0, leftGroup, "left_wrist");
 		pick(-ct, rightGroup, "right_wrist");
 		place(0, rightGroup, "right_wrist");
 	}
-	/*
 	pick(-5, rightGroup, "right_wrist");
 	place(0, rightGroup, "right_wrist");
 	pick(0, leftGroup, "left_wrist");
