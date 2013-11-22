@@ -17,16 +17,18 @@
 
 using namespace std;
 
-string filename = "trajectory_curved_left - 8.csv";
-string output = "trajectory_curved_left - 8.trj";
+string filename = "trj_curve_left_15.txt";
+string output = "trj_curve_left_15.trj";
 ofstream planOutput;
 double addTime = 0;
+geometry_msgs::Pose target;
 
 moveit::planning_interface::MoveGroup::Plan planToPose(string joint, move_group_interface::MoveGroup& group, geometry_msgs::Pose* pose);
 void openPlan(string filename, moveit::planning_interface::MoveGroup::Plan plan);
 void savePlan(moveit::planning_interface::MoveGroup::Plan plan);
 void closePlan();
 void fillMap(map<string, vector<double> > &goal, string filename);
+void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint);
 
 int main(int argc, char** argv)
 {
@@ -44,18 +46,45 @@ int main(int argc, char** argv)
 	rightGroup.setPlannerId("PRMstarkConfigDefault");
 	rightGroup.setStartStateToCurrentState();
 	move_group_interface::MoveGroup* group;
-	group = &leftGroup;
-	string joint = "left_wrist";
 
-	moveit::planning_interface::MoveGroup::Plan plan;
-	map<string, vector<double> > targetMap;
-	fillMap(targetMap, filename);
-	geometry_msgs::Pose target;
 	target.orientation.x = 0;
 	target.orientation.y = 1;
 	target.orientation.z = 0;
 	target.orientation.w = 0;
-
+	group = &rightGroup;
+	string joint = "right_wrist";
+	for (int i = 3; i < 8; ++i) {
+		addTime = 0;
+		stringstream filestream;
+		filestream << "trj_curve_right_" << i << ".txt";
+		filename = filestream.str();
+		stringstream outstream;
+		outstream << "trj_curve_right_" << i << ".trj";
+		output = outstream.str();
+		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
+		generateAndSavePlan(group, joint);
+	}
+		group = &leftGroup;
+	joint = "left_wrist";
+	for (int i = 13; i > 8; --i) {
+		addTime = 0;
+		stringstream filestream;
+		filestream << "trj_curve_left_" << i << ".txt";
+		filename = filestream.str();
+		stringstream outstream;
+		outstream << "trj_curve_left_" << i << ".trj";
+		output = outstream.str();
+		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
+		generateAndSavePlan(group, joint);
+	}
+	return 0;
+}
+void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint)
+{
+	
+	moveit::planning_interface::MoveGroup::Plan plan;
+	map<string, vector<double> > targetMap;
+	fillMap(targetMap, filename);
 	vector<double>::iterator xiter = targetMap["x"].begin();	
 	vector<double>::iterator yiter = targetMap["y"].begin();
 	vector<double>::iterator ziter = targetMap["z"].begin();
@@ -72,7 +101,6 @@ int main(int argc, char** argv)
 		savePlan(plan);
 	}
 	closePlan();
-	return 0;
 }
 moveit::planning_interface::MoveGroup::Plan planToPose(string joint, move_group_interface::MoveGroup& group, geometry_msgs::Pose* pose)
 {
@@ -96,12 +124,11 @@ void fillMap(map<string, vector<double> > &goals, string filename)
 	cout << filename.c_str() << endl;
 	goalInput.open(filename.c_str());
 	double value;
-	string keyLine;
+	string keyLine = "x,y,z";
 	string valueLine;
-	getline(goalInput, keyLine);
 	cout << keyLine << endl;
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-	boost::char_separator<char> commaDelimited(",");
+	boost::char_separator<char> commaDelimited(", ");
 	tokenizer keys(keyLine, commaDelimited);
 	while (getline(goalInput, valueLine)) {
 		tokenizer values(valueLine, commaDelimited);
