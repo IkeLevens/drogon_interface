@@ -64,7 +64,18 @@ int main(int argc, char** argv)
 		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
 		generateAndSavePlan(group, joint);
 	}
-		group = &leftGroup;
+	for (int i = 3; i < 8; ++i) {
+		addTime = 0;
+		stringstream filestream;
+		filestream << "trj_straight_right_" << i << ".txt";
+		filename = filestream.str();
+		stringstream outstream;
+		outstream << "trj_straight_right_" << i << ".trj";
+		output = outstream.str();
+		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
+		generateAndSavePlan(group, joint);
+	}
+	group = &leftGroup;
 	joint = "left_wrist";
 	for (int i = 13; i > 8; --i) {
 		addTime = 0;
@@ -73,6 +84,17 @@ int main(int argc, char** argv)
 		filename = filestream.str();
 		stringstream outstream;
 		outstream << "trj_curve_left_" << i << ".trj";
+		output = outstream.str();
+		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
+		generateAndSavePlan(group, joint);
+	}
+	for (int i = 13; i > 8; --i) {
+		addTime = 0;
+		stringstream filestream;
+		filestream << "trj_straight_left_" << i << ".txt";
+		filename = filestream.str();
+		stringstream outstream;
+		outstream << "trj_straight_left_" << i << ".trj";
 		output = outstream.str();
 		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
 		generateAndSavePlan(group, joint);
