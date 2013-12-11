@@ -50,7 +50,7 @@ void leftCallback (const baxter_msgs::EndpointState& msg)
 void rightCallback (const baxter_msgs::EndpointState& msg)
 {
 	ftime(&timmy);
-	if (rightRecord == 0 && timmy.millitm / 100 == 0) {
+	if (rightRecord == 9 && timmy.millitm / 100 == 0) {
 		rightRecord = -1;
 	}
 	if (timmy.millitm / 100 > rightRecord) {

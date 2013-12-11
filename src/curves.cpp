@@ -75,6 +75,7 @@ int main(int argc, char** argv)
 		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
 		generateAndSavePlan(group, joint);
 	}
+	/*
 	group = &leftGroup;
 	joint = "left_wrist";
 	for (int i = 13; i > 8; --i) {
@@ -99,6 +100,7 @@ int main(int argc, char** argv)
 		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
 		generateAndSavePlan(group, joint);
 	}
+	*/
 	return 0;
 }
 void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint)

@@ -93,6 +93,8 @@ add_executable(workspace src/workspace.cpp)
 add_executable(lines src/lines.cpp)
 add_executable(vilmi src/vilmi.cpp)
 add_executable(curves src/curves.cpp)
+add_executable(brian src/Brian.cpp)
+add_executable(rahul src/Rahul.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -134,6 +136,12 @@ target_link_libraries(vilmi
 	${catkin_LIBRARIES}
 )
 target_link_libraries(curves
+	${catkin_LIBRARIES}
+)
+target_link_libraries(brian
+	${catkin_LIBRARIES}
+)
+target_link_libraries(rahul
 	${catkin_LIBRARIES}
 )
 
