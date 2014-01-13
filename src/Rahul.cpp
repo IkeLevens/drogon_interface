@@ -17,8 +17,12 @@
 
 using namespace std;
 
-string filename = "trj_curve_left_15.txt";
+string filename = "displace.txt";
 geometry_msgs::Pose target;
+double scale;
+double initX=.25;
+double initY=-.5;
+
 
 moveit::planning_interface::MoveGroup::Plan planToPose(string joint, move_group_interface::MoveGroup& group, geometry_msgs::Pose* pose);
 void fillMap(map<string, vector<double> > &goal, string filename);
@@ -26,6 +30,8 @@ void generatePlan(move_group_interface::MoveGroup* group, string joint);
 
 int main(int argc, char** argv)
 {
+	scale=3.0/2500;
+	cout<<"Init Scale:"<<scale;
 	ros::init(argc, argv, "Test_Node");
 	// start a ROS spinning thread
 	ros::AsyncSpinner spinner(1);
@@ -45,7 +51,7 @@ int main(int argc, char** argv)
 	target.orientation.y = 0.707106781;
 	target.orientation.z = 0;
 	target.orientation.w = 0.707106781;
-	target.position.x = 0.2;
+	target.position.z = 0;
 	group = &rightGroup;
 	string joint = "right_wrist";
 	generatePlan(group, joint);
@@ -60,12 +66,12 @@ void generatePlan(move_group_interface::MoveGroup* group, string joint)
 	vector<double>::iterator yiter = targetMap["y"].begin();
 	for (xiter= targetMap["x"].begin(); xiter != targetMap["x"].end(); ++xiter) {
 		if (*xiter > 1) {
-			for (int i = 0; i < 4; ++i) {
+			for (int i = 0; i < 5; ++i) {
 				target.position.x += .01;
 				plan = planToPose(joint, *group, &target);
 				group->execute(plan);
 			}
-			system ("rosrun drogon_interface gripper.py close right");
+			system ("python ~/workspaces/hydro_ws/src/drogon_interface/src/gripper.py close right");
 			for (int i = 0; i < 5; ++i) {
 				target.position.z += .01;
 				plan = planToPose(joint, *group, &target);
@@ -78,16 +84,16 @@ void generatePlan(move_group_interface::MoveGroup* group, string joint)
 				plan = planToPose(joint, *group, &target);
 				group->execute(plan);
 			}
-			system ("rosrun drogon_interface gripper.py open right");
-			for (int i = 0; i < 4; ++i) {
+			system ("python ~/workspaces/hydro_ws/src/drogon_interface/src/gripper.py open right");
+			for (int i = 0; i < 5; ++i) {
 				target.position.x -= .01;
 				plan = planToPose(joint, *group, &target);
 				group->execute(plan);
 			}
 			++yiter;
 		} else {
-			target.position.x = *xiter;
-			target.position.y = *yiter;
+			target.position.x = *xiter+initX;
+			target.position.y = *yiter+initY;
 			++yiter;
 			plan = planToPose(joint, *group, &target);
 			group->execute(plan);
@@ -113,12 +119,11 @@ void fillMap(map<string, vector<double> > &goals, string filename)
 {
 	ROS_INFO("filling map");
 	ifstream goalInput;
-	cout << filename.c_str() << endl;
 	goalInput.open(filename.c_str());
+	cout<<"File Opened...";
 	double value;
-	string keyLine = "x,y,z";
+	string keyLine = "y,x";
 	string valueLine;
-	cout << keyLine << endl;
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 	boost::char_separator<char> commaDelimited(", ");
 	tokenizer keys(keyLine, commaDelimited);
@@ -128,7 +133,10 @@ void fillMap(map<string, vector<double> > &goals, string filename)
 		for (tokenizer::iterator key_iter = keys.begin();
 		key_iter != keys.end() && value_iter != values.end(); ++key_iter)
 		{
-			value = atof((*value_iter).c_str());
+			cout<<"\nBefore value "<<scale;
+			value = atof((*value_iter).c_str())*scale;
+			cout<<"\nValue: "<<value;
+
 			goals[*key_iter].push_back(value);
 			++value_iter;
 		}

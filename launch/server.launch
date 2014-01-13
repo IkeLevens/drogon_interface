@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <launch>
 
-	<node name="TrajectoryController" pkg="baxter_interface" type="trajectory_controller.py" respawn="false" output="screen"/>
+	<node name="TrajectoryController" pkg="baxter_interface" type="joint_trajectory_action_server.py" respawn="false" output="screen"/>
 
 	<node name="DrogonWebServer" pkg="drogon_interface" type="drogon_web_server" respawn="false" output="screen"/>
 

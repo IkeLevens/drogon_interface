@@ -51,13 +51,14 @@ int main(int argc, char** argv)
 		cin >> line;
 		z = atof(line.c_str());
 		geometry_msgs::Pose pose;
+		geometry_msgs::Pose current;
 		pose.position.x = x;
 		pose.position.y = y;
 		pose.position.z = z;
-		pose.orientation.x = .74329414;
-		pose.orientation.y = 0;
+		pose.orientation.x = 0;
+		pose.orientation.y = 0.707106781;
 		pose.orientation.z = 0;
-		pose.orientation.w = 0.668964732;
+		pose.orientation.w = 0.707106781;
 		group.setPoseTarget(pose, "right_wrist");
 //		group.setPositionTarget(x, y , z, "left_wrist");
 		moveit::planning_interface::MoveGroup::Plan plan;

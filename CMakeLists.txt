@@ -7,7 +7,8 @@ project(drogon_interface)
 ## is used, also find other catkin packages
 #set(baxter_msgs_DIR ~/workspaces/baxter_moveit/devel/share/baxter_msgs/cmake)
 #set(moveit_ros_move_group_DIR /opt/ros/hydro/share/moveit_ros_move_group/cmake)
-find_package(catkin REQUIRED COMPONENTS message_generation roscpp rospy baxter_msgs sensor_msgs std_msgs moveit_core moveit_ros_planning_interface moveit_ros_manipulation)
+find_package(catkin REQUIRED COMPONENTS message_generation roscpp rospy baxter_core_msgs sensor_msgs std_msgs moveit_ros_planning_interface moveit_ros_manipulation)
+#find_package(catkin REQUIRED COMPONENTS message_generation roscpp rospy baxter_msgs sensor_msgs std_msgs moveit_core moveit_ros_planning_interface moveit_ros_manipulation)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -78,72 +79,74 @@ include_directories(include
 )
 
 ## Declare a cpp library
-add_library(drogon_interface_library
-	src/DrogonControlInterfaceLibrary.cpp
-)
+#add_library(drogon_interface_library
+#	src/DrogonControlInterfaceLibrary.cpp
+#)
 
 ## Declare a cpp executable
-add_executable(drogon_interface_node src/DrogonControlInterfaceKeyboard.cpp)
-add_executable(moveit_test src/test.cpp)
-add_executable(planner src/planner.cpp)
+add_executable(endpoints src/Endpoint.cpp)
+#add_executable(drogon_interface_node src/DrogonControlInterfaceKeyboard.cpp)
+#add_executable(moveit_test src/test.cpp)
+#add_executable(planner src/planner.cpp)
 add_executable(drogon_web_server src/WebServer.cpp)
 add_executable(ik_test src/iktest.cpp)
-add_executable(hard_test src/hardcodetest.cpp)
-add_executable(workspace src/workspace.cpp)
-add_executable(lines src/lines.cpp)
-add_executable(vilmi src/vilmi.cpp)
-add_executable(curves src/curves.cpp)
-add_executable(brian src/Brian.cpp)
-add_executable(rahul src/Rahul.cpp)
+#add_executable(hard_test src/hardcodetest.cpp)
+#add_executable(workspace src/workspace.cpp)
+#add_executable(lines src/lines.cpp)
+#add_executable(vilmi src/vilmi.cpp)
+#add_executable(curves src/curves.cpp)
+#add_executable(brian src/Brian.cpp)
+#add_executable(rahul src/Rahul.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(drogon_interface_node drogon_interface_generate_messages_cpp baxter_msgs drogon_interface_library)
+#add_dependencies(drogon_interface_node drogon_interface_generate_messages_cpp baxter_msgs drogon_interface_library)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(drogon_interface_node
-	drogon_interface_library
-   ${catkin_LIBRARIES}
-)
-target_link_libraries(drogon_interface_library
+target_link_libraries(endpoints
 	${catkin_LIBRARIES}
 )
-target_link_libraries(moveit_test
-	${catkin_LIBRARIES}
-)
-target_link_libraries(planner
-	drogon_interface_library
-	${catkin_LIBRARIES}
-)
+#target_link_libraries(drogon_interface_node
+#	drogon_interface_library
+#   ${catkin_LIBRARIES}
+#)
+#target_link_libraries(drogon_interface_library
+#	${catkin_LIBRARIES}
+#)
+#target_link_libraries(moveit_test
+#	${catkin_LIBRARIES}
+#)
+#target_link_libraries(planner
+#	drogon_interface_library
+#	${catkin_LIBRARIES}
+#)
 target_link_libraries(drogon_web_server
-	drogon_interface_library
-	${catkin_LIBRARIERS}
+	${catkin_LIBRARIES}
 )
 target_link_libraries(ik_test
 	${catkin_LIBRARIES}
-	drogon_interface_library
 )
-target_link_libraries(hard_test
-	${catkin_LIBRARIES}
-)
-target_link_libraries(workspace
-	${catkin_LIBRARIES}
-)
-target_link_libraries(lines
-	${catkin_LIBRARIES}
-)
-target_link_libraries(vilmi
-	${catkin_LIBRARIES}
-)
-target_link_libraries(curves
-	${catkin_LIBRARIES}
-)
-target_link_libraries(brian
-	${catkin_LIBRARIES}
-)
-target_link_libraries(rahul
-	${catkin_LIBRARIES}
-)
+#target_link_libraries(hard_test
+#	${catkin_LIBRARIES}
+#)
+#target_link_libraries(workspace
+#	${catkin_LIBRARIES}
+#)
+#target_link_libraries(lines
+#	${catkin_LIBRARIES}
+#)
+#target_link_libraries(vilmi
+#	${catkin_LIBRARIES}
+#)
+#target_link_libraries(curves
+#	${catkin_LIBRARIES}
+#)
+#target_link_libraries(brian
+#	${catkin_LIBRARIES}
+#)
+#target_link_libraries(rahul
+#	${catkin_LIBRARIES}
+#)
 
 #############
 ## Install ##

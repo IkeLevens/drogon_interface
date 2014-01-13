@@ -23,6 +23,6 @@
 	<rosparam command="load" file="$(find baxter_moveit_config)/config/kinematics.yaml"/>
 
 	<!-- start Baxter Trajectory controller -->
-	<node name="TrajectoryController" pkg="baxter_interface" type="trajectory_controller.py" respawn="false" output="screen"/>
+	<node name="TrajectoryController" pkg="baxter_interface" type="joint_trajectory_action_server.py" respawn="false" output="screen"/>
 
 </launch>
