@@ -86,17 +86,17 @@ include_directories(include
 ## Declare a cpp executable
 add_executable(endpoints src/Endpoint.cpp)
 #add_executable(drogon_interface_node src/DrogonControlInterfaceKeyboard.cpp)
-#add_executable(moveit_test src/test.cpp)
+add_executable(moveit_test src/test.cpp)
 #add_executable(planner src/planner.cpp)
 add_executable(drogon_web_server src/WebServer.cpp)
 add_executable(ik_test src/iktest.cpp)
-#add_executable(hard_test src/hardcodetest.cpp)
-#add_executable(workspace src/workspace.cpp)
-#add_executable(lines src/lines.cpp)
+add_executable(hard_test src/hardcodetest.cpp)
+add_executable(workspace src/workspace.cpp)
+add_executable(lines src/lines.cpp)
 #add_executable(vilmi src/vilmi.cpp)
-#add_executable(curves src/curves.cpp)
-#add_executable(brian src/Brian.cpp)
-#add_executable(rahul src/Rahul.cpp)
+add_executable(curves src/curves.cpp)
+add_executable(brian src/Brian.cpp)
+add_executable(rahul src/Rahul.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -113,9 +113,9 @@ target_link_libraries(endpoints
 #target_link_libraries(drogon_interface_library
 #	${catkin_LIBRARIES}
 #)
-#target_link_libraries(moveit_test
-#	${catkin_LIBRARIES}
-#)
+target_link_libraries(moveit_test
+	${catkin_LIBRARIES}
+)
 #target_link_libraries(planner
 #	drogon_interface_library
 #	${catkin_LIBRARIES}
@@ -126,27 +126,27 @@ target_link_libraries(drogon_web_server
 target_link_libraries(ik_test
 	${catkin_LIBRARIES}
 )
-#target_link_libraries(hard_test
-#	${catkin_LIBRARIES}
-#)
-#target_link_libraries(workspace
-#	${catkin_LIBRARIES}
-#)
-#target_link_libraries(lines
-#	${catkin_LIBRARIES}
-#)
+target_link_libraries(hard_test
+	${catkin_LIBRARIES}
+)
+target_link_libraries(workspace
+	${catkin_LIBRARIES}
+)
+target_link_libraries(lines
+	${catkin_LIBRARIES}
+)
 #target_link_libraries(vilmi
 #	${catkin_LIBRARIES}
 #)
-#target_link_libraries(curves
-#	${catkin_LIBRARIES}
-#)
-#target_link_libraries(brian
-#	${catkin_LIBRARIES}
-#)
-#target_link_libraries(rahul
-#	${catkin_LIBRARIES}
-#)
+target_link_libraries(curves
+	${catkin_LIBRARIES}
+)
+target_link_libraries(brian
+	${catkin_LIBRARIES}
+)
+target_link_libraries(rahul
+	${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

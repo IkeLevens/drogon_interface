@@ -28,7 +28,7 @@ void commandCallback (const std_msgs::String::ConstPtr& msg)
 		std_msgs::Bool msg;
 		msg.data = true;
 		pub->publish(msg);
-		system(("rosrun baxter_examples joint_trajectory_file_playback.py -f " + data).c_str());
+		system(("rosrun baxter_examples joint_position_file_playback.py -f " + data).c_str());
 		msg.data=false;
 		pub->publish(msg);
 	}

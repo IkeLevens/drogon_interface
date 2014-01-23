@@ -9,7 +9,7 @@
 #include <trajectory_msgs/JointTrajectory.h>
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
 #include <geometry_msgs/Pose.h>
-#include <baxter_msgs/EndpointState.h>
+#include <baxter_core_msgs/EndpointState.h>
 #include <cstdlib>			//standard library for C/C++
 #include <iostream>
 #include <fstream>
@@ -53,7 +53,19 @@ int main(int argc, char** argv)
 	target.orientation.w = 0;
 	group = &rightGroup;
 	string joint = "right_wrist";
-	for (int i = 3; i < 8; ++i) {
+	
+	system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+	
+	addTime = 0;
+	stringstream filestream;
+	filestream << "short_" << 3 << ".csv";
+	filename = filestream.str();
+	stringstream outstream;
+	outstream << "short_" << 3 << ".trj";
+	output = outstream.str();
+	system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+	generateAndSavePlan(group, joint);
+/*	for (int i = 3; i < 9; ++i) {
 		addTime = 0;
 		stringstream filestream;
 		filestream << "trj_curve_right_" << i << ".txt";
@@ -61,10 +73,10 @@ int main(int argc, char** argv)
 		stringstream outstream;
 		outstream << "trj_curve_right_" << i << ".trj";
 		output = outstream.str();
-		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
+		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
 		generateAndSavePlan(group, joint);
 	}
-	for (int i = 3; i < 8; ++i) {
+	for (int i = 3; i < 9; ++i) {
 		addTime = 0;
 		stringstream filestream;
 		filestream << "trj_straight_right_" << i << ".txt";
@@ -72,13 +84,23 @@ int main(int argc, char** argv)
 		stringstream outstream;
 		outstream << "trj_straight_right_" << i << ".trj";
 		output = outstream.str();
-		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
+		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
 		generateAndSavePlan(group, joint);
 	}
-	/*
+	for (int i = 3; i < 9; ++i) {
+		addTime = 0;
+		stringstream filestream;
+		filestream << "short_" << i << ".csv";
+		filename = filestream.str();
+		stringstream outstream;
+		outstream << "short_right_" << i << ".trj";
+		output = outstream.str();
+		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+		generateAndSavePlan(group, joint);
+	}
 	group = &leftGroup;
 	joint = "left_wrist";
-	for (int i = 13; i > 8; --i) {
+	for (int i = 13; i > 7; --i) {
 		addTime = 0;
 		stringstream filestream;
 		filestream << "trj_curve_left_" << i << ".txt";
@@ -86,10 +108,10 @@ int main(int argc, char** argv)
 		stringstream outstream;
 		outstream << "trj_curve_left_" << i << ".trj";
 		output = outstream.str();
-		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
+		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
 		generateAndSavePlan(group, joint);
 	}
-	for (int i = 13; i > 8; --i) {
+	for (int i = 13; i > 7; --i) {
 		addTime = 0;
 		stringstream filestream;
 		filestream << "trj_straight_left_" << i << ".txt";
@@ -97,10 +119,20 @@ int main(int argc, char** argv)
 		stringstream outstream;
 		outstream << "trj_straight_left_" << i << ".trj";
 		output = outstream.str();
-		system ("rosrun joint_trajectory file_playback.py -f clear.trj");
+		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
 		generateAndSavePlan(group, joint);
 	}
-	*/
+	for (int i = 13; i > 7; --i) {
+		addTime = 0;
+		stringstream filestream;
+		filestream << "short_" << i << ".csv";
+		filename = filestream.str();
+		stringstream outstream;
+		outstream << "short_" << i << ".trj";
+		output = outstream.str();
+		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+		generateAndSavePlan(group, joint);
+	}*/
 	return 0;
 }
 void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint)
@@ -112,12 +144,25 @@ void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint)
 	vector<double>::iterator xiter = targetMap["x"].begin();	
 	vector<double>::iterator yiter = targetMap["y"].begin();
 	vector<double>::iterator ziter = targetMap["z"].begin();
+	vector<double>::iterator qxiter = targetMap["qx"].begin();
+	vector<double>::iterator qyiter = targetMap["qy"].begin();
+	vector<double>::iterator qziter = targetMap["qz"].begin();
+	vector<double>::iterator qwiter = targetMap["qw"].begin();
 	for (xiter= targetMap["x"].begin(); xiter != targetMap["x"].end(); ++xiter) {
 		target.position.x = *xiter;
 		target.position.y = *yiter;
 		target.position.z = *ziter;
+		target.orientation.x = *qxiter;
+		target.orientation.y = *qyiter;
+		target.orientation.z = *qziter;
+		target.orientation.w = *qwiter;
 		++yiter;
 		++ziter;
+		++qxiter;
+		++qyiter;
+		++qziter;
+		++qwiter;
+		cout << "planning to: " << target << endl;
 		plan = planToPose(joint, *group, &target);
 		if (xiter == targetMap["x"].begin()) {
 			openPlan(output, plan);
@@ -143,18 +188,19 @@ moveit::planning_interface::MoveGroup::Plan planToPose(string joint, move_group_
 }
 void fillMap(map<string, vector<double> > &goals, string filename)
 {
-	ROS_INFO("filling map");
+	cout << "filling map: " << filename << endl;
 	ifstream goalInput;
-	cout << filename.c_str() << endl;
 	goalInput.open(filename.c_str());
 	double value;
-	string keyLine = "x,y,z";
+	string keyLine = "x,y,z,qx,qy,qz,qw";
 	string valueLine;
 	cout << keyLine << endl;
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 	boost::char_separator<char> commaDelimited(", ");
 	tokenizer keys(keyLine, commaDelimited);
+	int count = 0;
 	while (getline(goalInput, valueLine)) {
+		++count;
 		tokenizer values(valueLine, commaDelimited);
 		tokenizer::iterator value_iter = values.begin();
 		for (tokenizer::iterator key_iter = keys.begin();
@@ -166,6 +212,7 @@ void fillMap(map<string, vector<double> > &goals, string filename)
 		}
 	}
 	goalInput.close();
+	cout << "fillMap finished: " << count << " lines" << endl;
 }
 void openPlan(string filename, moveit::planning_interface::MoveGroup::Plan plan)
 {

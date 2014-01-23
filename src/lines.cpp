@@ -9,7 +9,7 @@
 #include <trajectory_msgs/JointTrajectory.h>
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
 #include <geometry_msgs/Pose.h>
-#include <baxter_msgs/EndpointState.h>
+#include <baxter_core_msgs/EndpointState.h>
 #include <cstdlib>			//standard library for C/C++
 #include <iostream>
 #include <fstream>
