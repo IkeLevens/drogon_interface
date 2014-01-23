@@ -54,8 +54,6 @@ int main(int argc, char** argv)
 	group = &rightGroup;
 	string joint = "right_wrist";
 	
-	system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
-	
 	addTime = 0;
 	stringstream filestream;
 	filestream << "short_" << 3 << ".csv";
@@ -148,14 +146,17 @@ void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint)
 	vector<double>::iterator qyiter = targetMap["qy"].begin();
 	vector<double>::iterator qziter = targetMap["qz"].begin();
 	vector<double>::iterator qwiter = targetMap["qw"].begin();
+	cout << "iterators set" << endl;
 	for (xiter= targetMap["x"].begin(); xiter != targetMap["x"].end(); ++xiter) {
 		target.position.x = *xiter;
 		target.position.y = *yiter;
 		target.position.z = *ziter;
+		cout << "position set" << endl;
 		target.orientation.x = *qxiter;
 		target.orientation.y = *qyiter;
 		target.orientation.z = *qziter;
 		target.orientation.w = *qwiter;
+		cout << "orientation set" << endl;
 		++yiter;
 		++ziter;
 		++qxiter;
@@ -169,6 +170,7 @@ void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint)
 		}
 		savePlan(plan);
 	}
+	cout << "closing plan" << endl;
 	closePlan();
 }
 moveit::planning_interface::MoveGroup::Plan planToPose(string joint, move_group_interface::MoveGroup& group, geometry_msgs::Pose* pose)
@@ -233,7 +235,7 @@ void savePlan(moveit::planning_interface::MoveGroup::Plan plan)
 	double secs = 0;
 	for(vector<trajectory_msgs::JointTrajectoryPoint>::iterator pt =  plan.trajectory_.joint_trajectory.points.begin();
 			pt !=  plan.trajectory_.joint_trajectory.points.end(); pt++) {
-		secs = (*pt).time_from_start.toSec() / 4;
+		secs = (*pt).time_from_start.toSec() / 2;
 		stringstream pointStream;
 		pointStream << secs + addTime;
 		for(vector<double>::iterator dt = (*pt).positions.begin(); dt != (*pt).positions.end(); dt++) {
