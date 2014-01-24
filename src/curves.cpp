@@ -22,6 +22,8 @@ string output = "trj_curve_left_15.trj";
 ofstream planOutput;
 double addTime = 0;
 geometry_msgs::Pose target;
+map<string, double> clearState;
+move_group_interface::MoveGroup* bothArmsGroup;
 
 moveit::planning_interface::MoveGroup::Plan planToPose(string joint, move_group_interface::MoveGroup& group, geometry_msgs::Pose* pose);
 void openPlan(string filename, moveit::planning_interface::MoveGroup::Plan plan);
@@ -29,6 +31,8 @@ void savePlan(moveit::planning_interface::MoveGroup::Plan plan);
 void closePlan();
 void fillMap(map<string, vector<double> > &goal, string filename);
 void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint);
+void fillClearState();
+void clear();
 
 int main(int argc, char** argv)
 {
@@ -41,10 +45,15 @@ int main(int argc, char** argv)
 	// to the correct arm to be used for each target.
 	move_group_interface::MoveGroup leftGroup("left_arm");
 	move_group_interface::MoveGroup rightGroup("right_arm");
+	move_group_interface::MoveGroup bothGroup("both_arms");
 	leftGroup.setPlannerId("PRMstarkConfigDefault");
 	leftGroup.setStartStateToCurrentState();
 	rightGroup.setPlannerId("PRMstarkConfigDefault");
 	rightGroup.setStartStateToCurrentState();
+	bothGroup.setPlannerId("PRMstarkConfigDefault");
+	bothGroup.setStartStateToCurrentState();
+	bothArmsGroup = &bothGroup;
+	fillClearState();
 	move_group_interface::MoveGroup* group;
 
 	target.orientation.x = 0;
@@ -61,7 +70,7 @@ int main(int argc, char** argv)
 	stringstream outstream;
 	outstream << "short_" << 3 << ".trj";
 	output = outstream.str();
-	system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+	clear();
 	generateAndSavePlan(group, joint);
 /*	for (int i = 3; i < 9; ++i) {
 		addTime = 0;
@@ -71,7 +80,7 @@ int main(int argc, char** argv)
 		stringstream outstream;
 		outstream << "trj_curve_right_" << i << ".trj";
 		output = outstream.str();
-		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+		clear;
 		generateAndSavePlan(group, joint);
 	}
 	for (int i = 3; i < 9; ++i) {
@@ -82,7 +91,7 @@ int main(int argc, char** argv)
 		stringstream outstream;
 		outstream << "trj_straight_right_" << i << ".trj";
 		output = outstream.str();
-		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+		clear;
 		generateAndSavePlan(group, joint);
 	}
 	for (int i = 3; i < 9; ++i) {
@@ -93,7 +102,7 @@ int main(int argc, char** argv)
 		stringstream outstream;
 		outstream << "short_right_" << i << ".trj";
 		output = outstream.str();
-		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+		clear;
 		generateAndSavePlan(group, joint);
 	}
 	group = &leftGroup;
@@ -106,7 +115,7 @@ int main(int argc, char** argv)
 		stringstream outstream;
 		outstream << "trj_curve_left_" << i << ".trj";
 		output = outstream.str();
-		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+		clear;
 		generateAndSavePlan(group, joint);
 	}
 	for (int i = 13; i > 7; --i) {
@@ -117,7 +126,7 @@ int main(int argc, char** argv)
 		stringstream outstream;
 		outstream << "trj_straight_left_" << i << ".trj";
 		output = outstream.str();
-		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+		clear;
 		generateAndSavePlan(group, joint);
 	}
 	for (int i = 13; i > 7; --i) {
@@ -128,7 +137,7 @@ int main(int argc, char** argv)
 		stringstream outstream;
 		outstream << "short_" << i << ".trj";
 		output = outstream.str();
-		system ("rosrun baxter_examples joint_position_file_playback.py -f clear.trj");
+		clear;
 		generateAndSavePlan(group, joint);
 	}*/
 	return 0;
@@ -244,4 +253,26 @@ void savePlan(moveit::planning_interface::MoveGroup::Plan plan)
 		planOutput << pointStream.str() << "\n";
 	}
 	addTime += secs;
+}
+void fillClearState()
+{
+	clearState["left_s0"]=0.8574952594;
+	clearState["left_s1"]=-1.106383642;
+	clearState["left_e0"]=-0.0720970969482;
+	clearState["left_e1"]=1.260548711;
+	clearState["left_w0"]=-0.0720970969482;
+	clearState["left_w1"]=1.1830826813;
+	clearState["left_w2"]=-0.00498543755493;
+	clearState["right_s0"]=-0.708699123193;
+	clearState["right_s1"]=-0.980980712732;
+	clearState["right_e0"]=-0.282635959845;
+	clearState["right_e1"]=1.13859723851;
+	clearState["right_w0"]=0.141509727521;
+	clearState["right_w1"]=1.31922347607;
+	clearState["right_w2"]=-0.00498543755493;
+}
+void clear()
+{
+	bothArmsGroup->setJointValueTarget(clearState);
+	bothArmsGroup->move();
 }
