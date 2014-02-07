@@ -65,13 +65,14 @@ int main(int argc, char** argv)
 	
 	addTime = 0;
 	stringstream filestream;
-	filestream << "short_" << 3 << ".csv";
+	filestream << "trj_straight_right_" << 3 << ".txt";
 	filename = filestream.str();
 	stringstream outstream;
-	outstream << "short_" << 3 << ".trj";
+	outstream << "trj_straight_right_" << 3 << ".trj";
 	output = outstream.str();
 	clear();
 	generateAndSavePlan(group, joint);
+	clear();
 /*	for (int i = 3; i < 9; ++i) {
 		addTime = 0;
 		stringstream filestream;
@@ -256,7 +257,8 @@ void savePlan(moveit::planning_interface::MoveGroup::Plan plan)
 }
 void fillClearState()
 {
-	clearState["left_s0"]=0.8574952594;
+	//clearState["left_s0"]=0.8574952594;
+	clearState["left_s0"]=-0.5;
 	clearState["left_s1"]=-1.106383642;
 	clearState["left_e0"]=-0.0720970969482;
 	clearState["left_e1"]=1.260548711;

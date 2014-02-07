@@ -30,12 +30,12 @@ int main(int argc, char** argv)
 	ros::AsyncSpinner spinner(1);
 	spinner.start();
 	// this connecs to a running instance of the move_group node
-	move_group_interface::MoveGroup group("left_arm");
+	move_group_interface::MoveGroup group("right_arm");
 	group.setPlannerId("PRMstarkConfigDefault");
 	group.setStartStateToCurrentState();
 	ROS_INFO("setting target");
 	string line;
-	double x, y, z;
+	double x, y, z, qx, qy, qz, qw;
 	while(running) {
 		cout << "X" << endl;
 		cin >> line;
@@ -50,16 +50,28 @@ int main(int argc, char** argv)
 		cout << "Z" << endl;
 		cin >> line;
 		z = atof(line.c_str());
+		cout << "QX" << endl;
+		cin >> line;
+		qx = atof(line.c_str());
+		cout << "QY" << endl;
+		cin >> line;
+		qy = atof(line.c_str());
+		cout << "QZ" << endl;
+		cin >> line;
+		qz = atof(line.c_str());
+		cout << "QW" << endl;
+		cin >> qw;
+		//qw = atof(line.c_str());
 		geometry_msgs::Pose pose;
 		geometry_msgs::Pose current;
 		pose.position.x = x;
 		pose.position.y = y;
 		pose.position.z = z;
-		pose.orientation.x = 0;
-		pose.orientation.y = 1;
-		pose.orientation.z = 0;
-		pose.orientation.w = 0;
-		group.setPoseTarget(pose, "left_wrist");
+		pose.orientation.x = qx;
+		pose.orientation.y = qy;
+		pose.orientation.z = qz;
+		pose.orientation.w = qw;
+		group.setPoseTarget(pose, "right_wrist");
 //		group.setPositionTarget(x, y , z, "left_wrist");
 		moveit::planning_interface::MoveGroup::Plan plan;
 		ROS_INFO("requesting plan.");
