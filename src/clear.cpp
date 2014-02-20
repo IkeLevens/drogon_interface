@@ -40,8 +40,8 @@ int main(int argc, char** argv)
 }
 void fillClearState()
 {
-	//clearState["left_s0"]=0.8574952594;
-	clearState["left_s0"]=-0.5;
+	clearState["left_s0"]=0.8574952594;
+	//clearState["left_s0"]=-0.5;
 	clearState["left_s1"]=-1.106383642;
 	clearState["left_e0"]=-0.0720970969482;
 	clearState["left_e1"]=1.260548711;

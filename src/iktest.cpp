@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 	ros::AsyncSpinner spinner(1);
 	spinner.start();
 	// this connecs to a running instance of the move_group node
-	move_group_interface::MoveGroup group("right_arm");
+	move_group_interface::MoveGroup group("left_arm");
 	group.setPlannerId("PRMstarkConfigDefault");
 	group.setStartStateToCurrentState();
 	ROS_INFO("setting target");
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 		pose.orientation.y = qy;
 		pose.orientation.z = qz;
 		pose.orientation.w = qw;
-		group.setPoseTarget(pose, "right_wrist");
+		group.setPoseTarget(pose, "left_wrist");
 //		group.setPositionTarget(x, y , z, "left_wrist");
 		moveit::planning_interface::MoveGroup::Plan plan;
 		ROS_INFO("requesting plan.");

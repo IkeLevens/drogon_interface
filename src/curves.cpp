@@ -27,7 +27,7 @@ move_group_interface::MoveGroup* bothArmsGroup;
 
 moveit::planning_interface::MoveGroup::Plan planToPose(string joint, move_group_interface::MoveGroup& group, geometry_msgs::Pose* pose);
 void openPlan(string filename, moveit::planning_interface::MoveGroup::Plan plan);
-void savePlan(moveit::planning_interface::MoveGroup::Plan plan);
+void savePlan(moveit::planning_interface::MoveGroup::Plan plan, string joint);
 void closePlan();
 void fillMap(map<string, vector<double> > &goal, string filename);
 void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint);
@@ -65,80 +65,29 @@ int main(int argc, char** argv)
 	
 	addTime = 0;
 	stringstream filestream;
-	filestream << "trj_straight_right_" << 3 << ".txt";
-	filename = filestream.str();
-	stringstream outstream;
-	outstream << "trj_straight_right_" << 3 << ".trj";
-	output = outstream.str();
 	clear();
-	generateAndSavePlan(group, joint);
-	clear();
-/*	for (int i = 3; i < 9; ++i) {
-		addTime = 0;
-		stringstream filestream;
-		filestream << "trj_curve_right_" << i << ".txt";
-		filename = filestream.str();
-		stringstream outstream;
-		outstream << "trj_curve_right_" << i << ".trj";
-		output = outstream.str();
-		clear;
-		generateAndSavePlan(group, joint);
-	}
-	for (int i = 3; i < 9; ++i) {
-		addTime = 0;
-		stringstream filestream;
-		filestream << "trj_straight_right_" << i << ".txt";
-		filename = filestream.str();
-		stringstream outstream;
-		outstream << "trj_straight_right_" << i << ".trj";
-		output = outstream.str();
-		clear;
-		generateAndSavePlan(group, joint);
-	}
-	for (int i = 3; i < 9; ++i) {
+	for (int i = 3; i < 8; ++i) {
 		addTime = 0;
 		stringstream filestream;
 		filestream << "short_" << i << ".csv";
 		filename = filestream.str();
 		stringstream outstream;
-		outstream << "short_right_" << i << ".trj";
+		outstream << "trj_short_right_" << i << ".trj";
 		output = outstream.str();
-		clear;
+		clear();
 		generateAndSavePlan(group, joint);
-	}
+	}/*
 	group = &leftGroup;
 	joint = "left_wrist";
-	for (int i = 13; i > 7; --i) {
-		addTime = 0;
-		stringstream filestream;
-		filestream << "trj_curve_left_" << i << ".txt";
-		filename = filestream.str();
-		stringstream outstream;
-		outstream << "trj_curve_left_" << i << ".trj";
-		output = outstream.str();
-		clear;
-		generateAndSavePlan(group, joint);
-	}
-	for (int i = 13; i > 7; --i) {
-		addTime = 0;
-		stringstream filestream;
-		filestream << "trj_straight_left_" << i << ".txt";
-		filename = filestream.str();
-		stringstream outstream;
-		outstream << "trj_straight_left_" << i << ".trj";
-		output = outstream.str();
-		clear;
-		generateAndSavePlan(group, joint);
-	}
-	for (int i = 13; i > 7; --i) {
+	for (int i = 13; i > 8; --i) {
 		addTime = 0;
 		stringstream filestream;
 		filestream << "short_" << i << ".csv";
 		filename = filestream.str();
 		stringstream outstream;
-		outstream << "short_" << i << ".trj";
+		outstream << "trj_short_left_" << i << ".trj";
 		output = outstream.str();
-		clear;
+		clear();
 		generateAndSavePlan(group, joint);
 	}*/
 	return 0;
@@ -178,7 +127,7 @@ void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint)
 		if (xiter == targetMap["x"].begin()) {
 			openPlan(output, plan);
 		}
-		savePlan(plan);
+		savePlan(plan, joint);
 	}
 	cout << "closing plan" << endl;
 	closePlan();
@@ -208,7 +157,7 @@ void fillMap(map<string, vector<double> > &goals, string filename)
 	string valueLine;
 	cout << keyLine << endl;
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-	boost::char_separator<char> commaDelimited(", ");
+	boost::char_separator<char> commaDelimited("\t, ");
 	tokenizer keys(keyLine, commaDelimited);
 	int count = 0;
 	while (getline(goalInput, valueLine)) {
@@ -229,18 +178,13 @@ void fillMap(map<string, vector<double> > &goals, string filename)
 void openPlan(string filename, moveit::planning_interface::MoveGroup::Plan plan)
 {
 	planOutput.open(filename.c_str());
-	planOutput << "time";
-	for(vector<string>::iterator it =  plan.trajectory_.joint_trajectory.joint_names.begin();
-			it !=  plan.trajectory_.joint_trajectory.joint_names.end(); it++) {
-		planOutput << "," << *it;
-	}
-	planOutput << "\n";
+	planOutput << "time,left_s0,left_s1,left_e0,left_e1,left_w0,left_w1,left_w2,left_gripper,right_s0,right_s1,right_e0,right_e1,right_w0,right_w1,right_w2,right_gripper\n";
 }
 void closePlan()
 {
 	planOutput.close();
 }
-void savePlan(moveit::planning_interface::MoveGroup::Plan plan)
+void savePlan(moveit::planning_interface::MoveGroup::Plan plan, string joint)
 {
 	double secs = 0;
 	for(vector<trajectory_msgs::JointTrajectoryPoint>::iterator pt =  plan.trajectory_.joint_trajectory.points.begin();
@@ -248,8 +192,32 @@ void savePlan(moveit::planning_interface::MoveGroup::Plan plan)
 		secs = (*pt).time_from_start.toSec() / 2;
 		stringstream pointStream;
 		pointStream << secs + addTime;
-		for(vector<double>::iterator dt = (*pt).positions.begin(); dt != (*pt).positions.end(); dt++) {
-			pointStream << "," << *dt;
+		if (joint.compare("left_wrist")==0) {
+			for(vector<double>::iterator dt = (*pt).positions.begin(); dt != (*pt).positions.end(); dt++) {
+				pointStream << "," << *dt;
+			}
+			pointStream << ",100";
+			pointStream << "," << clearState["right_s0"];
+			pointStream << "," << clearState["right_s1"];
+			pointStream << "," << clearState["right_e0"];
+			pointStream << "," << clearState["right_e1"];
+			pointStream << "," << clearState["right_w0"];
+			pointStream << "," << clearState["right_w1"];
+			pointStream << "," << clearState["right_w2"];
+			pointStream << ",100";
+		} else {
+			pointStream << "," << clearState["left_s0"];
+			pointStream << "," << clearState["left_s1"];
+			pointStream << "," << clearState["left_e0"];
+			pointStream << "," << clearState["left_e1"];
+			pointStream << "," << clearState["left_w0"];
+			pointStream << "," << clearState["left_w1"];
+			pointStream << "," << clearState["left_w2"];
+			pointStream << ",100";
+			for(vector<double>::iterator dt = (*pt).positions.begin(); dt != (*pt).positions.end(); dt++) {
+				pointStream << "," << *dt;
+			}
+			pointStream << ",100";
 		}
 		planOutput << pointStream.str() << "\n";
 	}
@@ -257,8 +225,7 @@ void savePlan(moveit::planning_interface::MoveGroup::Plan plan)
 }
 void fillClearState()
 {
-	//clearState["left_s0"]=0.8574952594;
-	clearState["left_s0"]=-0.5;
+	clearState["left_s0"]=0.8574952594;
 	clearState["left_s1"]=-1.106383642;
 	clearState["left_e0"]=-0.0720970969482;
 	clearState["left_e1"]=1.260548711;

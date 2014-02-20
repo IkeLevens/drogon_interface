@@ -98,6 +98,7 @@ add_executable(curves src/curves.cpp)
 add_executable(brian src/Brian.cpp)
 add_executable(rahul src/Rahul.cpp)
 add_executable(clear src/clear.cpp)
+add_executable(trjparser src/trjparser.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -149,6 +150,9 @@ target_link_libraries(rahul
 	${catkin_LIBRARIES}
 )
 target_link_libraries(clear
+	${catkin_LIBRARIES}
+)
+target_link_libraries(trjparser
 	${catkin_LIBRARIES}
 )
 
