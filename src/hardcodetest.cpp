@@ -43,13 +43,12 @@ int main(int argc, char** argv)
 	pose->orientation.z = 0;
 	pose->orientation.w = 0;
 	moveToPose("right_wrist", rightGroup, pose);
-	/*
 	for (int ct = 1; ct < 5; ++ct) {
 		pick(ct, leftGroup, "left_wrist");
 		place(0, leftGroup, "left_wrist");
 		pick(-ct, rightGroup, "right_wrist");
 		place(0, rightGroup, "right_wrist");
-	}
+	}/*
 	pick(-5, rightGroup, "right_wrist");
 	place(0, rightGroup, "right_wrist");
 	pick(0, leftGroup, "left_wrist");
@@ -91,8 +90,9 @@ void pick (int cup, move_group_interface::MoveGroup& group, string joint) {
 	moveToPose(joint, group, pose);
 	pose->position.z = 0.135;
 	moveToPose(joint, group, pose);
+	moveToPose(joint, group, pose);
 	stringstream ss;
-	ss << "python /home/pracsys/workspaces/hydro_ws/src/drogon_interface/src/gripper.py close " << arm;
+	ss << "python /home/pracsys/workspaces/hydro_ws/src/drogon_interface/scripts/gripper.py close " << arm;
 	system(ss.str().c_str());
 	pose->position.z = 0.35;
 	moveToPose(joint, group, pose);
@@ -116,7 +116,7 @@ void place (int cup, move_group_interface::MoveGroup& group, string joint) {
 	pose ->position.z = 0.20;
 	moveToPose(joint, group, pose);
 	stringstream ss;
-	ss << "python /home/pracsys/workspaces/hydro_ws/src/drogon_interface/src/gripper.py open " << arm;
+	ss << "python /home/pracsys/workspaces/hydro_ws/src/drogon_interface/scripts/gripper.py open " << arm;
 	system(ss.str().c_str());
 	pose->position.z = 0.35;
 	moveToPose(joint, group, pose);
