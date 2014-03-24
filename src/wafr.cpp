@@ -18,17 +18,8 @@
 using namespace std;
 
 ofstream outFile;
-double addTime = 0;
-geometry_msgs::Pose target;
-map<string, double> clearState;
-move_group_interface::MoveGroup* bothArmsGroup;
-
-moveit::planning_interface::MoveGroup::Plan planToPose(string joint, move_group_interface::MoveGroup& group, geometry_msgs::Pose* pose);
-void openPlan(string filename, moveit::planning_interface::MoveGroup::Plan plan);
-void savePlan(moveit::planning_interface::MoveGroup::Plan plan, string joint);
-void closePlan();
-void fillMap(map<string, vector<double> > &goal, string filename);
-void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint);
+void openOutput(string filename);
+void closeOutput();
 
 int main(int argc, char** argv)
 {
@@ -45,86 +36,46 @@ int main(int argc, char** argv)
 		// Create MoveGroup instances for each arm, set them to PRM*, and create a pointer to be assigned
 		// to the correct arm to be used for each target.
 		move_group_interface::MoveGroup leftGroup("left_arm");
-		move_group_interface::MoveGroup rightGroup("right_arm");
-		move_group_interface::MoveGroup bothGroup("both_arms");
 		leftGroup.setPlannerId("PRMstarkConfigDefault");
 		leftGroup.setStartStateToCurrentState();
-		rightGroup.setPlannerId("PRMstarkConfigDefault");
-		rightGroup.setStartStateToCurrentState();
-		bothGroup.setPlannerId("PRMstarkConfigDefault");
-		bothGroup.setStartStateToCurrentState();
-		bothArmsGroup = &bothGroup;
-		fillClearState();
-		move_group_interface::MoveGroup* group;
 
-		target.orientation.x = 0;
-		target.orientation.y = 1;
-		target.orientation.z = 0;
-		target.orientation.w = 0;
-		group = &rightGroup;
-		string joint = "right_wrist";
-		
-		addTime = 0;
-		stringstream filestream;
-		
 		// New functionality goes here.
+
+		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+		boost::char_separator<char> commaDelimited(",");
+		string keyLine = "left_s0,left_s1,left_e0,left_e1,left_w0,left_w1,left_w2";
+		map<string, double> goal;
+		ifstream configs;
+		configs.open(argv[3].c_str());
+		int count = 0;
+		string configString;
+		while (getline(configs, configString)) {
+			if ((count % lines) == 0) {
+				if (count != 0) {
+					closeOutput();
+					system("rosrun baxter_examples joint_trajectory_file_playback -f temp.trj");
+				}
+				tokenizer keys(keyLine, commaDelimited);
+				tokenizer config(configString, commaDelimited);
+				tokenizer::iterator config_iter = config.begin();
+				for (tokenizer::iterator key_iter = keys.begin(); key_iter != keys.end();
+						++key_iter) {
+					goal[*key_iter] = atof((*config_iter).c_str());
+					++config_iter;
+				}
+				leftGroup.setJointValueTarget(goal);
+				leftGroup.move();
+				if (atof(*config_iter) > 0) {
+					system("rosrun drogon_interface gripper.py open left");
+				} else {
+					system("rosrun drogon_interface gripper.py close left");
+				}
+				openOutput("temp.trj");
+			}
+		}
+
 		return 0;
 	}
-}
-void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint)
-{
-	
-	moveit::planning_interface::MoveGroup::Plan plan;
-	map<string, vector<double> > targetMap;
-	fillMap(targetMap, filename);
-	vector<double>::iterator xiter = targetMap["x"].begin();	
-	vector<double>::iterator yiter = targetMap["y"].begin();
-	vector<double>::iterator ziter = targetMap["z"].begin();
-	vector<double>::iterator qxiter = targetMap["qx"].begin();
-	vector<double>::iterator qyiter = targetMap["qy"].begin();
-	vector<double>::iterator qziter = targetMap["qz"].begin();
-	vector<double>::iterator qwiter = targetMap["qw"].begin();
-	cout << "iterators set" << endl;
-	for (xiter= targetMap["x"].begin(); xiter != targetMap["x"].end(); ++xiter) {
-		target.position.x = *xiter;
-		target.position.y = *yiter;
-		target.position.z = *ziter;
-		cout << "position set" << endl;
-		target.orientation.x = *qxiter;
-		target.orientation.y = *qyiter;
-		target.orientation.z = *qziter;
-		target.orientation.w = *qwiter;
-		cout << "orientation set" << endl;
-		++yiter;
-		++ziter;
-		++qxiter;
-		++qyiter;
-		++qziter;
-		++qwiter;
-		cout << "planning to: " << target << endl;
-		plan = planToPose(joint, *group, &target);
-		if (xiter == targetMap["x"].begin()) {
-			openPlan(output, plan);
-		}
-		savePlan(plan, joint);
-	}
-	cout << "closing plan" << endl;
-	closePlan();
-}
-moveit::planning_interface::MoveGroup::Plan planToPose(string joint, move_group_interface::MoveGroup& group, geometry_msgs::Pose* pose)
-{
-	bool gotPlan;
-	moveit::planning_interface::MoveGroup::Plan plan;
-	group.setPoseTarget(*pose, joint);
-	ROS_INFO("requesting plan.");
-	gotPlan = group.plan(plan);
-	if (gotPlan) {
-		ROS_INFO("plan received.");
-//		cout << plan.trajectory_ << endl;
-		group.execute(plan);
-		ROS_INFO("plan execution completed.");
-	}
-	return plan;
 }
 void fillMap(map<string, vector<double> > &goals, string filename)
 {
@@ -132,15 +83,14 @@ void fillMap(map<string, vector<double> > &goals, string filename)
 	ifstream goalInput;
 	goalInput.open(filename.c_str());
 	double value;
-	string keyLine = "x,y,z,qx,qy,qz,qw";
+	string keyLine = "left_s0,left_s1,left_e0,left_e1,left_w0,left_w1,left_w2,left_gripper";
 	string valueLine;
 	cout << keyLine << endl;
 	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-	boost::char_separator<char> commaDelimited("\t, ");
+	boost::char_separator<char> commaDelimited(",");
 	tokenizer keys(keyLine, commaDelimited);
 	int count = 0;
 	while (getline(goalInput, valueLine)) {
-		++count;
 		tokenizer values(valueLine, commaDelimited);
 		tokenizer::iterator value_iter = values.begin();
 		for (tokenizer::iterator key_iter = keys.begin();
@@ -150,56 +100,18 @@ void fillMap(map<string, vector<double> > &goals, string filename)
 			goals[*key_iter].push_back(value);
 			++value_iter;
 		}
+		++count;
 	}
 	goalInput.close();
 	cout << "fillMap finished: " << count << " lines" << endl;
 }
-void openPlan(string filename, moveit::planning_interface::MoveGroup::Plan plan)
+void openOutput(string filename)
 {
-	planOutput.open(filename.c_str());
-	planOutput << "time,left_s0,left_s1,left_e0,left_e1,left_w0,left_w1,left_w2,left_gripper,right_s0,right_s1,right_e0,right_e1,right_w0,right_w1,right_w2,right_gripper\n";
+	outFile.open(filename.c_str());
+	outFIle << "time,left_s0,left_s1,left_e0,left_e1,left_w0,left_w1,left_w2,left_gripper,right_s0,right_s1,right_e0,right_e1,right_w0,right_w1,right_w2,right_gripper\n";
 }
-void closePlan()
+void closeOutput()
 {
-	planOutput.close();
-}
-void savePlan(moveit::planning_interface::MoveGroup::Plan plan, string joint)
-{
-	double secs = 0;
-	for(vector<trajectory_msgs::JointTrajectoryPoint>::iterator pt =  plan.trajectory_.joint_trajectory.points.begin();
-			pt !=  plan.trajectory_.joint_trajectory.points.end(); pt++) {
-		secs = (*pt).time_from_start.toSec() / 2;
-		stringstream pointStream;
-		pointStream << secs + addTime;
-		if (joint.compare("left_wrist")==0) {
-			for(vector<double>::iterator dt = (*pt).positions.begin(); dt != (*pt).positions.end(); dt++) {
-				pointStream << "," << *dt;
-			}
-			pointStream << ",100";
-			pointStream << "," << clearState["right_s0"];
-			pointStream << "," << clearState["right_s1"];
-			pointStream << "," << clearState["right_e0"];
-			pointStream << "," << clearState["right_e1"];
-			pointStream << "," << clearState["right_w0"];
-			pointStream << "," << clearState["right_w1"];
-			pointStream << "," << clearState["right_w2"];
-			pointStream << ",100";
-		} else {
-			pointStream << "," << clearState["left_s0"];
-			pointStream << "," << clearState["left_s1"];
-			pointStream << "," << clearState["left_e0"];
-			pointStream << "," << clearState["left_e1"];
-			pointStream << "," << clearState["left_w0"];
-			pointStream << "," << clearState["left_w1"];
-			pointStream << "," << clearState["left_w2"];
-			pointStream << ",100";
-			for(vector<double>::iterator dt = (*pt).positions.begin(); dt != (*pt).positions.end(); dt++) {
-				pointStream << "," << *dt;
-			}
-			pointStream << ",100";
-		}
-		planOutput << pointStream.str() << "\n";
-	}
-	addTime += secs;
+	outFile.close();
 }
 
