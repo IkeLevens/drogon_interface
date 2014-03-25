@@ -44,18 +44,22 @@ int main(int argc, char** argv)
 		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 		boost::char_separator<char> commaDelimited(",");
 		string keyLine = "left_s0,left_s1,left_e0,left_e1,left_w0,left_w1,left_w2";
+		string defaults = "-0.708699123193,-0.980980712732,-0.282635959845,1.13859723851,0.141509727521,1.31922347607,-0.00498543755493,0.0\n";
 		map<string, double> goal;
 		ifstream configs;
+		int lines = atoi(argv[1].c_str());
+		int step = atoi(argv[2].c_str());
 		configs.open(argv[3].c_str());
 		int count = 0;
 		string configString;
+		bool open = true;
+		tokenizer keys(keyLine, commaDelimited);
 		while (getline(configs, configString)) {
 			if ((count % lines) == 0) {
 				if (count != 0) {
 					closeOutput();
 					system("rosrun baxter_examples joint_trajectory_file_playback -f temp.trj");
 				}
-				tokenizer keys(keyLine, commaDelimited);
 				tokenizer config(configString, commaDelimited);
 				tokenizer::iterator config_iter = config.begin();
 				for (tokenizer::iterator key_iter = keys.begin(); key_iter != keys.end();
@@ -65,16 +69,42 @@ int main(int argc, char** argv)
 				}
 				leftGroup.setJointValueTarget(goal);
 				leftGroup.move();
-				if (atof(*config_iter) > 0) {
+				if (atoi(*config_iter) == 1) {
+					open = true;
 					system("rosrun drogon_interface gripper.py open left");
 				} else {
 					system("rosrun drogon_interface gripper.py close left");
+					open = false;
 				}
 				openOutput("temp.trj");
+				outFile << (count * step) << ",";
+				for (tokenizer::iterator key_iter = keys.begin(); key_iter != keys.end();
+						++key_iter) {
+					outFile << goal[*key_iter] << ",";
+				}
+				if (open) {
+					outFile << "100.0,";
+				} else {
+					outFile << "0.0,";
+				}
+				outfile << defaults;
+			} else {
+				tokenizer config(configString, commaDelimited);
+				outFile << (count * step) << ",";
+				tokenizer::iterator config_iter = config.begin();
+				for (size_t i=0; i<7; ++i) {
+					outFile << *config_iter << ",";
+					++config_iter;
+				}
+				if (atoi(*config_iter) == 1) {
+					outFile << "100.0,";
+				} else {
+					outFile << "0.0,";
+				}
+				outFile << defaults;
 			}
 		}
-
-		return 0;
+	return 0;
 	}
 }
 void fillMap(map<string, vector<double> > &goals, string filename)
