@@ -28,13 +28,13 @@ int main(int argc, char** argv)
 		ros::AsyncSpinner spinner(1);
 		spinner.start();
 		
+		/*
 		// Create MoveGroup instances for each arm, set them to PRM*, and create a pointer to be assigned
 		// to the correct arm to be used for each target.
 		move_group_interface::MoveGroup leftGroup("left_arm");
 		leftGroup.setPlannerId("PRMstarkConfigDefault");
 		leftGroup.setStartStateToCurrentState();
-
-		// New functionality goes here.
+		*/
 
 		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 		boost::char_separator<char> commaDelimited(",");
@@ -43,17 +43,29 @@ int main(int argc, char** argv)
 		map<string, double> goal;
 		ifstream configs;
 		int lines = atoi(argv[1]);
-		int step = atoi(argv[2]);
+		if (lines == 0) {
+			cout << "run as one file.\n";
+			lines = INT_MAX;
+		} else {
+			cout << "lines per run: " << lines << endl;
+		}
+		float step = atof(argv[2]);
+		cout << "step timing: " << step << " ms\n";
+		step /= 1000;
 		configs.open(argv[3]);
+		cout << "filename: " << argv[3] << endl;
+		cout << "configs: " << configs << endl;
 		int count = 0;
 		string configString;
 		bool open = true;
 		tokenizer keys(keyLine, commaDelimited);
 		while (getline(configs, configString)) {
+			//cout << count;
 			if ((count % lines) == 0) {
+				cout << "iteration: " << count / lines << endl;
 				if (count != 0) {
 					closeOutput();
-					system("rosrun baxter_examples joint_trajectory_file_playback -f temp.trj");
+					system("rosrun baxter_examples joint_position_file_playback.py -f temp.trj");
 				}
 				tokenizer config(configString, commaDelimited);
 				tokenizer::iterator config_iter = config.begin();
@@ -62,25 +74,28 @@ int main(int argc, char** argv)
 					goal[*key_iter] = atof((*config_iter).c_str());
 					++config_iter;
 				}
+				/*
+				// This code block relies on MoveIt MoveGroup.
 				leftGroup.setJointValueTarget(goal);
 				leftGroup.move();
-				if (atoi((*config_iter).c_str()) == 1) {
+				if (atoi((*config_iter).c_str()) == 0) {
 					open = true;
 					system("rosrun drogon_interface gripper.py open left");
 				} else {
 					system("rosrun drogon_interface gripper.py close left");
 					open = false;
 				}
+				*/
 				openOutput("temp.trj");
 				outFile << (count * step) << ",";
 				for (tokenizer::iterator key_iter = keys.begin(); key_iter != keys.end();
 						++key_iter) {
 					outFile << goal[*key_iter] << ",";
 				}
-				if (open) {
-					outFile << "100.0,";
-				} else {
+				if (atoi((*config_iter).c_str()) == 1) {
 					outFile << "0.0,";
+				} else {
+					outFile << "100.0,";
 				}
 				outFile << defaults;
 			} else {
@@ -92,23 +107,28 @@ int main(int argc, char** argv)
 					++config_iter;
 				}
 				if (atoi((*config_iter).c_str()) == 1) {
-					outFile << "100.0,";
-				} else {
 					outFile << "0.0,";
+				} else {
+					outFile << "100.0,";
 				}
 				outFile << defaults;
 			}
+			++count;
 		}
-	return 0;
+		closeOutput();
+		system("rosrun baxter_examples joint_position_file_playback.py -f temp.trj");
+		return 0;
 	}
 }
 void openOutput(string filename)
 {
+	cout << "openOutput(" << filename << ")\n";
 	outFile.open(filename.c_str());
 	outFile << "time,left_s0,left_s1,left_e0,left_e1,left_w0,left_w1,left_w2,left_gripper,right_s0,right_s1,right_e0,right_e1,right_w0,right_w1,right_w2,right_gripper\n";
 }
 void closeOutput()
 {
+	cout << "closeOutput()\n";
 	outFile.close();
 }
 
