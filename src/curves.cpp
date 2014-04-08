@@ -27,15 +27,19 @@ move_group_interface::MoveGroup* bothArmsGroup;
 
 moveit::planning_interface::MoveGroup::Plan planToPose(string joint, move_group_interface::MoveGroup& group, geometry_msgs::Pose* pose);
 void openPlan(string filename, moveit::planning_interface::MoveGroup::Plan plan);
-void savePlan(moveit::planning_interface::MoveGroup::Plan plan, string joint);
+void savePlan(moveit::planning_interface::MoveGroup::Plan plan, string joint, float time_divisor);
 void closePlan();
 void fillMap(map<string, vector<double> > &goal, string filename);
-void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint);
+void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint, float time_divisor);
 void fillClearState();
 void clear();
 
 int main(int argc, char** argv)
 {
+	if (argc < 8) {
+		cout << "usage: curves <left_start> <left_end> <right_start> <right_end> <time divisor> <input_header> <output_header>\n";
+		return -1;
+	}
 	ros::init(argc, argv, "Test_Node");
 	// start a ROS spinning thread
 	ros::AsyncSpinner spinner(1);
@@ -60,39 +64,44 @@ int main(int argc, char** argv)
 	target.orientation.y = 1;
 	target.orientation.z = 0;
 	target.orientation.w = 0;
-	group = &rightGroup;
-	string joint = "right_wrist";
+	group = &leftGroup;
+	string joint = "left_wrist";
 	
 	addTime = 0;
 	stringstream filestream;
 	clear();
-	for (int i = 3; i < 8; ++i) {
+	int left_start = atoi(argv[1]);
+	int left_stop = atoi(argv[2]);
+	int right_start = atoi(argv[3]);
+	int right_stop = atoi(argv[4]);
+	float div = atof(argv[5]);
+	for (int i = left_start; i <= left_stop; ++i) {
 		addTime = 0;
 		stringstream filestream;
-		filestream << "short_" << i << ".csv";
+		filestream << argv[6] << "_left_" << i << ".txt";
 		filename = filestream.str();
 		stringstream outstream;
-		outstream << "trj_short_right_" << i << ".trj";
+		outstream << argv[7] << "_left_" << i << ".trj";
 		output = outstream.str();
 		clear();
-		generateAndSavePlan(group, joint);
-	}/*
-	group = &leftGroup;
-	joint = "left_wrist";
-	for (int i = 13; i > 8; --i) {
+		generateAndSavePlan(group, joint, div);
+	}
+	group = &rightGroup;
+	joint = "right_wrist";
+	for (int i = right_start; i <= right_stop; ++i) {
 		addTime = 0;
 		stringstream filestream;
-		filestream << "short_" << i << ".csv";
+		filestream << argv[6] << "_right_" << i << ".txt";
 		filename = filestream.str();
 		stringstream outstream;
-		outstream << "trj_short_left_" << i << ".trj";
+		outstream << argv[7] << "_right_" << i << ".trj";
 		output = outstream.str();
 		clear();
-		generateAndSavePlan(group, joint);
-	}*/
+		generateAndSavePlan(group, joint, div);
+	}
 	return 0;
 }
-void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint)
+void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint, float time_divisor)
 {
 	
 	moveit::planning_interface::MoveGroup::Plan plan;
@@ -127,7 +136,7 @@ void generateAndSavePlan(move_group_interface::MoveGroup* group, string joint)
 		if (xiter == targetMap["x"].begin()) {
 			openPlan(output, plan);
 		}
-		savePlan(plan, joint);
+		savePlan(plan, joint, time_divisor);
 	}
 	cout << "closing plan" << endl;
 	closePlan();
@@ -184,12 +193,12 @@ void closePlan()
 {
 	planOutput.close();
 }
-void savePlan(moveit::planning_interface::MoveGroup::Plan plan, string joint)
+void savePlan(moveit::planning_interface::MoveGroup::Plan plan, string joint, float time_divisor)
 {
 	double secs = 0;
 	for(vector<trajectory_msgs::JointTrajectoryPoint>::iterator pt =  plan.trajectory_.joint_trajectory.points.begin();
 			pt !=  plan.trajectory_.joint_trajectory.points.end(); pt++) {
-		secs = (*pt).time_from_start.toSec() / 2;
+		secs = (*pt).time_from_start.toSec() / time_divisor;
 		stringstream pointStream;
 		pointStream << secs + addTime;
 		if (joint.compare("left_wrist")==0) {

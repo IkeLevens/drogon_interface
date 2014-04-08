@@ -18,11 +18,18 @@ void closeOutput();
 
 int main(int argc, char** argv)
 {
-	if (argc < 4) {
-		cout << "usage: wafr <# lines / file> <ms per step> <input filename>\n";
+	bool position = false;
+	if (argc < 5) {
+		cout << "usage: wafr <# lines / file> <ms per step> <input filename> <position/trajectory>\n";
 		return -1;
 	}
 	else {
+		if (argv[4] == "position") {
+			position = true;
+		} else if (argv[4] != "trajectory") {
+			cout << "usage: wafr <# lines / file> <ms per step> <input filename> <position/trajectory>\n";
+			return -1;
+		}
 		ros::init(argc, argv, "WAFR_Node");
 		// start a ROS spinning thread
 		ros::AsyncSpinner spinner(1);
@@ -65,7 +72,11 @@ int main(int argc, char** argv)
 				cout << "iteration: " << count / lines << endl;
 				if (count != 0) {
 					closeOutput();
-					system("rosrun baxter_examples joint_position_file_playback.py -f temp.trj");
+					if (position) {
+						system("rosrun baxter_examples joint_position_file_playback.py -f temp.trj");
+					} else {
+						system("rosrun baxter_examples joint_trajectory_file_playback.py -f temp.trj");
+					}
 				}
 				tokenizer config(configString, commaDelimited);
 				tokenizer::iterator config_iter = config.begin();
@@ -116,7 +127,11 @@ int main(int argc, char** argv)
 			++count;
 		}
 		closeOutput();
-		system("rosrun baxter_examples joint_position_file_playback.py -f temp.trj");
+		if (position) {
+			system("rosrun baxter_examples joint_position_file_playback.py -f temp.trj");
+		} else {
+			system("rosrun baxter_examples joint_trajectory_file_playback.py -f temp.trj");
+		}
 		return 0;
 	}
 }
