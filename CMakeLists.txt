@@ -100,6 +100,7 @@ add_executable(rahul src/Rahul.cpp)
 add_executable(clear src/clear.cpp)
 add_executable(trjparser src/trjparser.cpp)
 add_executable(wafr src/wafr.cpp)
+add_executable(hri_test src/hri_test.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -157,6 +158,9 @@ target_link_libraries(trjparser
 	${catkin_LIBRARIES}
 )
 target_link_libraries(wafr
+	${catkin_LIBRARIES}
+)
+target_link_libraries(hri_test
 	${catkin_LIBRARIES}
 )
 
