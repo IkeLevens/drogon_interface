@@ -6,13 +6,7 @@ import std_msgs.msg
 import time
 import re
 
-ser = serial.Serial(
-	port='/dev/ttyACM0',\
-	baudrate=1200,\
-	parity=serial.PARITY_NONE,\
-	stopbits=serial.STOPBITS_ONE,\
-	bytesize=serial.EIGHTBITS,\
-		timeout=0)
+ser = serial.Serial(port='/dev/ttyACM0', baudrate=1200, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0)
 
 print("connected to: " + ser.portstr)
 
