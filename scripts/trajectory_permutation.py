@@ -64,7 +64,7 @@ for i in range(0,3):
 		running = True
 		while (running):
 			time.sleep(0.05)
-		print str(50 * i + j + 1) + ' trials run, press any key to begin next trial.'
+		print str(50 * i + j + 1) + ' trials run, press any key to begin next trial. (Do not press escape.)'
 		a = getch()
 		if ord(a) == 27:
 			exit()

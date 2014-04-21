@@ -7,6 +7,10 @@ left_start = int(sys.argv[3])
 left_end = int(sys.argv[4])
 fileStart = sys.argv[5]
 outputLength = 8.0
+#scale = [10,10,10,3.16,3.45,4.5,4.59,4.31,10,3.79,4.3,4.4,4.45,4.7,10,10]
+#for i in range(1,16):
+#	scale[i] /= 3.16
+#	scale[i] += outputLength
 for i in range(right_start, right_end + 1):
 	print i
 	inputName = fileStart + '_right_' + str(i) + '.trj'
