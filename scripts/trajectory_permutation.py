@@ -1,3 +1,8 @@
+import serial
+import os
+import sys
+import time
+import re
 import rospy
 import std_msgs.msg
 import time
@@ -10,6 +15,18 @@ targetArray = [[3, 4, 5, 6, 7], [9, 10, 11, 12, 13]]
 finalArray = []
 running = True
 pygame.init()
+
+ser = serial.Serial(port='/dev/ttyACM0', baudrate=1200, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=0)
+subject = sys.argv[1]
+path = '/home/pracsys/hri/' + subject
+if not os.path.exists(path):
+	os.makedirs(path)
+line = []
+prefix = path + '/' + subject
+f = open(prefix + "b" + str(0) + "t" + str(0) + ".txt", 'w')
+f.close()
+start = time.time()
+valid = re.compile('\d\.\d\d')
 
 #This section of the code is from an answer written by John Millikin on http://stackoverflow.com/questions/1394956/how-to-do-hit-any-key-in-python
 try:
@@ -62,9 +79,29 @@ for i in range(0,3):
 			pygame.mixer.music.load("/var/www/Baxter/bell.wav")
 			pygame.mixer.music.play()
 		running = True
+		f = open(prefix + "b" + str(i) + "t" + str(j) + ".txt", 'w')
+		f.write(finalArray[j] + '\n')
+		start = time.time()
 		while (running):
-			time.sleep(0.05)
+			try:
+				for c in ser.read():
+					line.append(c)
+					if c == '\n' and not f.closed:
+						numberString = ''.join(line)
+						number = valid.search(numberString)
+						if (number):
+							f.write(str(time.time() - start) + '\t')
+							f.write(number.group(0))
+							f.write('\n')
+						line = []
+						break
+			except:
+				continue
+		f.close()
+		line = []
 		pub.publish(data = clear)
 		running = True
 		while (running):
 			time.sleep(0.05)
+f.close()
+ser.close()
