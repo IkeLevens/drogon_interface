@@ -1,0 +1,38 @@
+Contents of drogon_interface repository:
+CMakeLists.txt (required for the catkin build system) -- this file contains a list of source files from which to build executables, the names for those executables, and libraries to which those executables must be linked.
+package.xml (required for the catkin build system) -- this file contains a list of dependencies for the package.
+LICENSE -- a BSD 3-clause license for the contents of the repository.
+include: -- C++ header files
+	DrogonConrolInterfaceLibrary.h -- A header file to the C++ Library DrogonControlInterfaceLibrary.  This library was not updated for version 0.7.0 of the Baxter RSDK, as I made the decision to move from OOP based executable and library design paradigm to a simpler (for this task) imperative design paradigm.
+src: -- C++ source files
+	Brian.cpp This is an executable written for Brian McMahan's project for cs673.  It is used to record the workspace coordinates of the arm with timestamps.
+	DrogonControlInterfaceKeyboard.cpp -- This executable makes use of the DrogonControlInterfaceLibrary to allow keyboard control of a baxter robot.  It has been deprecated now, as its purpose was primarily in learning to control the robot using the position controller.
+	DrogonControlInterfaceLibrary.cpp -- This library was designed to allow control of a baxter robot.  It is now deprecated.
+Endpoint.cpp -- This executable creates a log of endpoint positions similar to Brian.cpp.  This executable was written as part of the design process for that project.
+	Rahul.cpp -- This executable was written for Rahul Shome's project for CS673.  It takes a plan in a 2D planning space and moves the baxter robot in SE(3) based on that plan.
+	Webserver.cpp -- This executable enables the baxter robot, subscribes to the ros topic /web, and then runs the joint_trajectory_file_playback.py script of the baxter_examples package of the RSDK with the data string received from messages sent on this topic as a parameter.  It publishes on the topic /playback whether it is or is not currently executing a trajectory.
+	clear.cpp -- This executable uses moveit as a planner to move the baxter robot to the clear position we have defined.
+	curves.cpp -- This executable takes as input a text file with a series of position vectors in the workspace, plans between those positions using moveit and an OMPL implementation of moveit, and provides as output a text file with a series of timestamped position vectors in the configuration space.
+	hardcodetest.cpp -- an example executable which makes the baxter robot pick up and stack cups (in open loop without sensing) cups from the standard setup we use for the HRI legibility experiments.
+	hri_test.cpp -- This executable iterates over every trajectory used in the HRI legibility experiment for testing purposes.
+	iktest.cpp  -- This executable takes x, y, z, and a quaternian as inputs through standard terminal interface and then plans and moves to the given pose.
+	lines.cpp -- This executable, now deprecated, was going to be used to generate the straight line trajectories for the HRI legibility experiment, but instead we used the curves executable.
+	pick_and_place_tutorial.cpp -- A Willow Garage pick and place tutorial which we made use of in learning to control the Baxter robot.
+	planner.cpp -- This executable was similar to curves.cpp, but made use of a DrogonControlInterfaceLibrary instance.  It is deprecated.
+	test.cpp -- This executable was used in testing how a trajectory could be saved as a text file.
+	trjparser.cpp -- This execuable parses a .trj file.  This was written with the intention that actual fuctionality would be added to it which would run on each line of the file.
+	vilmi.cpp, vilmi_bu.cpp -- These executables were written for Vilmi's project for CS673.  Her project involved having the baxter robot interact with a simulated touchscreen interface and testing its ability to accurately reach the interface elements.
+	wafr.cpp -- given a set of position vectors in the configuration space, this executable will break the input file into a series of trajectory files which will have evenly placed timestamps added to it, then run the trajectory files.  The input file, number of lines per run, and number of miliseconds per step are each taken as command line parameters.
+	workspace.cpp -- this executable adds an estimate of the experimental workspace setup to the collision volume for moveit.
+scripts: -- Python scripts 
+	face.py -- takes the output of the left hand camera and displays it on the face display of the Baxter robot.
+	gripper.py -- opens or closes the left or right gripper on the Baxter robot.
+	keyboard_control.py -- A slightly modified version of the joint_position_keyboard_control.py script in the baxter_examples package of the RSDK.  This was used for one of the graduate students' project in CS673, but I cannot remember which it was.
+	time_scale.py -- This script scales several .trj files to be exactly 10 seconds long and saves each one as a .ts file.
+	trajectory_permutation.py -- This script runs three random permutations of the set of all trajectories for the HRI legibility experiment, waiting for a key press between each trial.  During the run of the trajectory it records the pointer positions coming over the serial port from the Arduino.
+launch: -- ROS launch files
+	drogon.launch -- This is deprecated since version 0.7.0 of the RSDK.
+	moveit_test.launch -- This is deprecated since version 0.7.0 of the RSDK.
+	planner.launch -- This is deprecated since version 0.7.0 of the RSDK.
+	prepare.launch -- The current launch file for moveit.
+	server.launch -- creates nodes for a Webserver, a trajectory controller, and a rosbridge server.  This is used for the HRI legibility experiment.
