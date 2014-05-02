@@ -23,7 +23,7 @@ if not os.path.exists(path):
 	os.makedirs(path)
 line = []
 prefix = path + '/' + subject
-f = open(prefix + "b" + str(0) + "t" + str(0).zfill(2) + ".txt", 'w')
+f = open(prefix + "b" + str(0) + "t" + str(0).zfill(2) + ".csv", 'w')
 f.close()
 start = time.time()
 valid = re.compile('\d\.\d\d')
@@ -79,7 +79,7 @@ for i in range(0,3):
 			pygame.mixer.music.load("/var/www/Baxter/bell.wav")
 			pygame.mixer.music.play()
 		running = True
-		f = open(prefix + "b" + str(i) + "t" + str(j).zfill(2) + ".txt", 'w')
+		f = open(prefix + "b" + str(i) + "t" + str(j).zfill(2) + ".csv", 'w')
 		f.write(finalArray[j] + '\n')
 		start = time.time()
 		while (running):
