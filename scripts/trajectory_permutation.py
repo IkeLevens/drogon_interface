@@ -103,5 +103,11 @@ for i in range(0,3):
 		running = True
 		while (running):
 			time.sleep(0.05)
+	pygame.mixer.music.load("/var/www/Baxter/power_down.mp3")
+	pygame.mixer.music.play()
+	print 'please enjoy your break.  The experiment will resume in 2 minutes.'
+	time.sleep(120)
+	pygame.mixer.music.load("/var/www/Baxter/power_up.mp3")
+	pygame.mixer.music.play()
 f.close()
 ser.close()
